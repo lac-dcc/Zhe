@@ -29,9 +29,9 @@ _SELECT email, address FROM users WHERE first_name=":masked1" AND last_name="\<s
 
 A further example follows below:
 
-Original query:
-SELECT item FROM carts WHERE userid=(SELECT userid FROM sessions WHERE sessionid=4525927)
-Redacted query:
+Original query:</br>
+SELECT item FROM carts WHERE userid=(SELECT userid FROM sessions WHERE sessionid=4525927)</br>
+Redacted query:</br>
 SELECT item FROM carts WHERE userid=(SELECT userid FROM sessions WHERE sessionid=9234245)
 
 To be useful in the craft of practical tools, such redaction techniques should be fast and invertible. By invertible, we mean that a certified user should be able to recover the original query, having access to its censored version. By fast, we mean that the computational cost of obfuscating queries should not be high enough to prevent the approach from being deployed in usable tools. The creation of such a framework asks for solutions to a few research questions, namely:
