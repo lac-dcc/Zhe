@@ -32,6 +32,8 @@ A further example follows below:
 
 Original query:</br>
 `SELECT item FROM carts WHERE userid=(SELECT userid FROM sessions WHERE sessionid=4525927)`
+
+
 Redacted query:</br>
 `SELECT item FROM carts WHERE userid=(SELECT userid FROM sessions WHERE sessionid=9234245)`
 
