@@ -51,8 +51,8 @@ public class Simulator
 
             if( runEventProb < curProb){
                 double prob = (i/maxTime) * 100.0;
-                System.out.print( String.format("%.1f", prob)+"% - ");
-                System.out.println(this.choose(new File(queriesFile)));
+                System.out.println( String.format("%.1f", prob)+"% - " + this.choose(new File(queriesFile)));
+                // System.out.println(this.choose(new File(queriesFile)));
             }else{
                 Thread.sleep((long)(step * timeMult));
             }

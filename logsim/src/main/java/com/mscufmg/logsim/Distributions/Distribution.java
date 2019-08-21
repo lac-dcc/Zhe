@@ -26,6 +26,9 @@ public abstract class Distribution {
         
         return x;
     }
+    public String toString(){
+        return "Distribution need a new toString()";
+    } 
 
 }
 

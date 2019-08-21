@@ -27,4 +27,9 @@ public class Normal extends Distribution {
         }
         return 0.5 + sum * pdf(z);
     }    
+    
+    @Override
+    public String toString(){
+        return "Normal(mu=" + this.mu + ", sigma="+ this.sigma + ")";
+    } 
 }

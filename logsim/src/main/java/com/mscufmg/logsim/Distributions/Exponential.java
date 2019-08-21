@@ -17,4 +17,9 @@ public class Exponential extends Distribution {
     protected double cdf(int x){
         return 1.0 - Math.exp(-this.lambda * x);
     }    
+
+    @Override
+    public String toString(){
+        return "Exponential(lambda="+this.lambda+")";
+    }
 }

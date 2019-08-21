@@ -3,6 +3,8 @@ package com.mscufmg.javaagent;
 import com.mscufmg.isomorph.SQLTree;
 import com.mscufmg.isomorph.nodes.LeafNode;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.io.PrintStream;
 import java.io.OutputStream;
 import java.io.IOException;
@@ -16,6 +18,9 @@ import net.sf.jsqlparser.JSQLParserException;
 public class SQLSecurePrintStream extends PrintStream {
     private SQLTree pattern;
     private OutputStream outStream;
+    private long numStringEvents;
+    private long numSQLQueries;
+    private final ArrayList<String> START_SQL = new ArrayList(Arrays.asList("select", "create", "update", "delete", "use", "set", "show"));
 
     /**
      *  Contructor.
@@ -44,15 +49,20 @@ public class SQLSecurePrintStream extends PrintStream {
      *  @param s: the String to output.
      */
     public void print(String s){
+        this.numStringEvents += 1;
+        String sql = getSQLQuery(s.split(" "));
+        
         SimpleNode SQLNode = null;
         try {
-            SQLNode = this.parse(s);
+            SQLNode = this.parse(sql);
         } catch (JSQLParserException e) {}
         
         String output = s;
 
         if(SQLNode != null){
-            output = this.formatSQL(new SQLTree(SQLNode), s);
+            this.numSQLQueries += 1;
+            String newSQL = this.formatSQL(new SQLTree(SQLNode), sql);
+            output = s.replace(sql, newSQL);
         }
 
         try {
@@ -110,5 +120,84 @@ public class SQLSecurePrintStream extends PrintStream {
             }
         }   
         return resp;
+    }
+
+    private ArrayList<String> combine(ArrayList<String> l1, ArrayList<String>l2){
+        ArrayList<String> resp = new ArrayList();
+        resp.addAll(l1);
+        resp.addAll(l2);
+        return resp;
+    }
+
+    private String join(String sep, ArrayList<String> list){
+        if(list.size() <= 0)
+            return "";
+        String resp = list.get(0);
+        for(int i = 1; i < list.size(); i++)
+            resp += sep + list.get(i);
+        return resp;
+
+    }
+
+    private String getSQLQuery(String[] tokens){
+        ArrayList<String> prefix = new ArrayList();
+        ArrayList<String> sql = new ArrayList();
+        ArrayList<String> suffix = new ArrayList();
+        
+        int state = 0;
+
+        for(String token: tokens){
+
+            if(state == 0) {
+                
+                if(START_SQL.contains(token)){
+                    state = 1;
+                    sql.add(token);
+                } else{
+                    prefix.add(token);
+                }
+                 
+            } else if(state == 1) {
+                
+                if(isValidSQL(this.join(" ", sql))){
+                    state = 2;
+                    suffix.add(token);
+                }else{ 
+                    sql.add(token);
+                }
+
+            } else if(state == 2) {
+                suffix.add(token);
+
+                ArrayList<String> combination = this.combine(sql, suffix);
+                if(isValidSQL(this.join(" ", combination))){
+                    sql = combination;
+                    suffix.clear();
+                }
+            }
+        }
+
+        ArrayList<String> combination = this.combine(sql, suffix);
+        if(suffix.size() > 0 && isValidSQL(this.join(" ", combination))){
+            sql = combination;
+        }
+        return this.join(" ", sql);
+    }
+
+    private boolean isValidSQL(String sql){
+        try{
+            this.parse(sql); 
+        } catch(Exception e){
+            return false;
+        }
+        return true;
+    }
+
+    public long getNumStringEvents(){
+        return this.numStringEvents;
+    }
+    
+    public long getNumSQLQueries(){
+        return this.numSQLQueries;
     }
 }

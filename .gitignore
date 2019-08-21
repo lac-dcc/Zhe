@@ -21,4 +21,7 @@ venv
 srini_sample
 analysis
 logsim/results/*
+exp_scripts
+old_results
+oltpbench
 *.log
