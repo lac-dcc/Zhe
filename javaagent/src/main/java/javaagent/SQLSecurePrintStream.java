@@ -5,9 +5,9 @@ import com.mscufmg.isomorph.nodes.LeafNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.io.PrintStream;
 import java.io.OutputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 
 import net.sf.jsqlparser.parser.*;
 import net.sf.jsqlparser.JSQLParserException;
@@ -15,11 +15,12 @@ import net.sf.jsqlparser.JSQLParserException;
 /**
  * This class implements a logic to create a Secure Print Stream from SQL Queries.
  */
-public class SQLSecurePrintStream extends PrintStream {
+public class SQLSecurePrintStream extends CustomPrintStream {
+
     private SQLTree pattern;
-    private OutputStream outStream;
     private long numStringEvents;
     private long numSQLQueries;
+    private final String key;
     private final ArrayList<String> START_SQL = new ArrayList(Arrays.asList("select", "create", "update", "delete", "use", "set", "show"));
 
     /**
@@ -28,12 +29,12 @@ public class SQLSecurePrintStream extends PrintStream {
      *  @param outStream: an Output Stream.
      *  @param filename:  the filename containing the SQLTree Obfuscation pattern.
      */
-    public SQLSecurePrintStream(OutputStream outStream, String filename) throws IOException, ClassNotFoundException{
+    public SQLSecurePrintStream(OutputStream outStream, String filename, String key) throws IOException, ClassNotFoundException{
         super(outStream, true);
-        this.outStream = outStream;
         this.pattern = SQLTree.deserialize(filename);
+        this.key = key;
     }
-    
+
     /**
      *  Parse a SQL Query.
      *
@@ -42,21 +43,80 @@ public class SQLSecurePrintStream extends PrintStream {
     private SimpleNode parse(String s) throws JSQLParserException {
         return (SimpleNode) CCJSqlParserUtil.parseAST(s);
     }
-    
-    /**
-     *  Output a String to the Output Stream.
-     *
-     *  @param s: the String to output.
-     */
-    public void print(String s){
+
+    public void write (byte[] buffer, int offset, int len)
+    {
+        
+        if(buffer[len -1] != '\n'){
+            String output = this.processBytes(Arrays.copyOfRange(buffer, offset, offset + len));
+        
+            buffer = output.getBytes();
+            len = output.length(); 
+        }
+
+        try
+        {
+
+            out.write(buffer, offset,len);
+
+            if (auto_flush)
+                flush ();
+        }
+        catch (InterruptedIOException iioe)
+        {
+            Thread.currentThread ().interrupt ();
+        }
+        catch (IOException e)
+        {
+            setError ();
+        }
+    }
+
+    public void write (int oneByte)
+    {
+        try
+        {
+            out.write (oneByte & 0xff);
+
+            if (auto_flush && (oneByte == '\n'))
+                flush ();
+        }
+        catch (InterruptedIOException iioe)
+        {
+            Thread.currentThread ().interrupt ();
+        }
+        catch (IOException e)
+        {
+            setError ();
+        }
+    }
+
+    protected void writeChars(char[] buf, int offset, int count)
+            throws IOException
+        {
+            byte[] bytes = (new String(buf, offset, count)).getBytes();
+            this.write(bytes, 0, bytes.length);
+        }
+
+    protected void writeChars(String str, int offset, int count)
+            throws IOException
+        {
+            byte[] bytes = str.substring(offset, offset+count).getBytes();
+            this.write(bytes, 0, bytes.length);
+        }
+
+    public String processBytes(byte[] bytes){
+        
+        String s = new String(bytes);
+
         this.numStringEvents += 1;
         String sql = getSQLQuery(s.split(" "));
-        
+
         SimpleNode SQLNode = null;
         try {
             SQLNode = this.parse(sql);
         } catch (JSQLParserException e) {}
-        
+
         String output = s;
 
         if(SQLNode != null){
@@ -64,48 +124,32 @@ public class SQLSecurePrintStream extends PrintStream {
             String newSQL = this.formatSQL(new SQLTree(SQLNode), sql);
             output = s.replace(sql, newSQL);
         }
-
-        try {
-            this.out.write(output.getBytes());
-        } catch (IOException e){}
-
+        return output;
     }
 
-    /**
-     *  Output a character to the Output Stream.
-     *
-     *  @param c: the character to output.
-     */
-    public void print(char c){
-        try{
-            this.out.write(c);
-        } catch(IOException e) {}
-    }
-    
-    /**
-     *  Output a String to the Output Stream with a new line character on the end.
-     *
-     *  @param s: the String to output.
-     */
-    public void println(String s){
-        this.print(s);
-        this.print('\n');
-    }
-    
     /**
      *  Redacts a sensitive literal in a SQL Query.
      *
      *  @param sql:  the SQL Query to be redacted.
      *  @param node: the LeafNode contaning the sensitive literal.
      */
-    private String redact(String sql, LeafNode node){
-        String resp = sql.substring(0, node.getBegin()-1);
-        for(int i = node.getBegin(); i <= node.getEnd(); i++)
-            resp += "*";
-        resp += sql.substring(node.getEnd());
+    private String redact(String sql, ArrayList<LeafNode> nodes){
+        String resp = sql.substring(0, nodes.get(0).getBegin() - 1);
+
+        for(int i = 0; i < nodes.size(); i++){
+            LeafNode node = nodes.get(i);
+            String text = sql.substring(node.getBegin(), node.getEnd());
+            String encriptText = AES.encrypt(text, this.key); 
+            resp += encriptText;
+            
+            if(i + 1 < nodes.size())
+                resp += sql.substring(node.getEnd(), nodes.get(i+1).getBegin()-1);
+            else
+                resp += sql.substring(node.getEnd());
+        }
         return resp;
     }
-    
+
     /**
      *  Rewrite a SQL Query hiding all it's literals.
      *  
@@ -115,9 +159,7 @@ public class SQLSecurePrintStream extends PrintStream {
     private String formatSQL(SQLTree tree, String sql){
         String resp = sql;
         if(this.pattern.matches(tree)){
-            for(LeafNode node : pattern.getSensitiveLiterals(tree)){
-                resp = this.redact(resp, node);
-            }
+            resp = this.redact(resp, pattern.getSensitiveLiterals(tree));
         }   
         return resp;
     }
@@ -143,22 +185,22 @@ public class SQLSecurePrintStream extends PrintStream {
         ArrayList<String> prefix = new ArrayList();
         ArrayList<String> sql = new ArrayList();
         ArrayList<String> suffix = new ArrayList();
-        
+
         int state = 0;
 
         for(String token: tokens){
 
             if(state == 0) {
-                
+
                 if(START_SQL.contains(token)){
                     state = 1;
                     sql.add(token);
                 } else{
                     prefix.add(token);
                 }
-                 
+
             } else if(state == 1) {
-                
+
                 if(isValidSQL(this.join(" ", sql))){
                     state = 2;
                     suffix.add(token);
@@ -196,7 +238,7 @@ public class SQLSecurePrintStream extends PrintStream {
     public long getNumStringEvents(){
         return this.numStringEvents;
     }
-    
+
     public long getNumSQLQueries(){
         return this.numSQLQueries;
     }
