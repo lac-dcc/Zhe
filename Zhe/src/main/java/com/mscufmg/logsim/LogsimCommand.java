@@ -35,11 +35,18 @@ public class LogsimCommand
     
     @Parameter(names={"-s", "--sleep"}, description="Sleep time for an event")
     private Double sleep = 1000000.0;
+    
+    @Parameter(names={"-r", "--random-sampling"}, description="Sample lines of a file to log")
+    private boolean sample = false;
 
     public void run(Distribution d){
         Simulator s = new Simulator(d);
         try{
-            s.run(this.logfile, this.totalDuration, this.numSamples, this.sleep);
+            if(this.sample)
+                s.runOnSamples(this.logfile, this.totalDuration, this.numSamples, this.sleep);
+            else
+                s.runOnFile(this.logfile, this.totalDuration, this.sleep);
+
         } catch(java.lang.InterruptedException e){
             System.out.println(e);
             return;

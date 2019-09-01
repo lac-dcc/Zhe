@@ -3,6 +3,7 @@ package com.mscufmg.Zhe.logsim;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -42,7 +43,7 @@ public class Simulator
         return result;
     }
 
-    public void run(String queriesFile, double maxTime, double numEvents, double timeMult) throws java.lang.InterruptedException, FileNotFoundException {
+    public void runOnSamples(String queriesFile, double maxTime, double numEvents, double timeMult) throws java.lang.InterruptedException, FileNotFoundException {
         double step = maxTime/numEvents;
 
         for(double i = 0.0; i < maxTime; i += step){
@@ -57,6 +58,18 @@ public class Simulator
                 Thread.sleep((long)(step * timeMult));
             }
 
+        }
+    }
+
+    public void runOnFile(String queriesFile, double maxTime, double timeMult) throws java.lang.             InterruptedException, FileNotFoundException {
+        Scanner scanner = new Scanner(new File(queriesFile));
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            System.out.println(line);
+
+            double samplePart = this.generator.nextDouble() * maxTime;
+            double curProb = this.dist.pdf(samplePart);
+            Thread.sleep((long)(curProb * timeMult));
         }
     }
 

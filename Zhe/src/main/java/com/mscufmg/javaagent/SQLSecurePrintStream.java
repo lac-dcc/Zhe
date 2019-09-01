@@ -46,10 +46,10 @@ public class SQLSecurePrintStream extends CustomPrintStream {
 
     public void write (byte[] buffer, int offset, int len)
     {
-        
+
         if(buffer[len -1] != '\n'){
             String output = this.processBytes(Arrays.copyOfRange(buffer, offset, offset + len));
-        
+
             buffer = output.getBytes();
             len = output.length(); 
         }
@@ -106,11 +106,11 @@ public class SQLSecurePrintStream extends CustomPrintStream {
         }
 
     public String processBytes(byte[] bytes){
-        
-        String s = new String(bytes);
+
+        String s = new String(bytes).toLowerCase();
 
         this.numStringEvents += 1;
-        String sql = getSQLQuery(s.split(" "));
+        String sql = getSQLQuery(s.replaceAll("\\s", " ").split(" "));
 
         SimpleNode SQLNode = null;
         try {
@@ -123,7 +123,7 @@ public class SQLSecurePrintStream extends CustomPrintStream {
             this.numSQLQueries += 1;
             String newSQL = this.formatSQL(new SQLTree(SQLNode), sql);
             output = s.replace(sql, newSQL);
-        }
+        } 
         return output;
     }
 
@@ -141,7 +141,7 @@ public class SQLSecurePrintStream extends CustomPrintStream {
             String text = sql.substring(node.getBegin(), node.getEnd());
             String encriptText = AES.encrypt(text, this.key); 
             resp += encriptText;
-            
+
             if(i + 1 < nodes.size())
                 resp += sql.substring(node.getEnd(), nodes.get(i+1).getBegin()-1);
             else
