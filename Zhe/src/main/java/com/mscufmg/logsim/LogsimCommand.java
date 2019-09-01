@@ -26,10 +26,7 @@ public class LogsimCommand
 {
     @Parameter(names={"-l", "--logfile"}, description="Simulation logfile", required=true)
     private String logfile;
-
-    @Parameter(names={"-f", "--filename"}, description="Obfuscation Pattern filename", required=true)
-    private String filename;
-    
+ 
     @Parameter(names={"-d", "--duration"}, description="Maximum time value for the simulation")
     private Double totalDuration = 2.0;
     
