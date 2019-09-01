@@ -3,6 +3,7 @@ package com.mscufmg.Zhe.logsim;
 import com.mscufmg.Zhe.trainer.SQLTree;
 import com.mscufmg.Zhe.trainer.nodes.LeafNode;
 import com.mscufmg.Zhe.logsim.distributions.Distribution;
+import com.mscufmg.Zhe.javaagent.SQLSecurePrintStream;
 
 import java.io.IOException;
 
@@ -49,16 +50,11 @@ public class LogsimCommand
             System.out.println("Simulation error: Pattern file not found!");
             return;
         }
-        // if(System.out instanceof SQLSecurePrintStream){
+        if(System.out instanceof SQLSecurePrintStream){
 
-        //     System.err.print(((SQLSecurePrintStream)System.out).getNumStringEvents() + ", "+ ((SQLSecurePrintStream)System.out).getNumSQLQueries() + ", \""+d.toString() + "\"");
-        // } else {
-        //     System.err.print("0, 0, \""+ d.toString() + "\"");
-        // }
-        // if(this.test){
-        //     this.test(this.filename, this.queries);
-        // }else{
-        //     this.train(this.queries, this.filename);
-        // }
+            System.err.print(((SQLSecurePrintStream)System.out).getNumStringEvents() + ", "+ ((SQLSecurePrintStream)System.out).getNumSQLQueries() + ", \""+d.toString() + "\"");
+        } else {
+            System.err.print("0, 0, \""+ d.toString() + "\"");
+        }
     }
 }

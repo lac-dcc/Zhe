@@ -36,7 +36,7 @@
    obligated to do so.  If you do not wish to do so, delete this
    exception statement from your version. */
 
-package com.mscufmg.javaagent;
+package com.mscufmg.Zhe.javaagent; 
 
 import java.util.Locale;
 import java.util.Formatter;

@@ -1,4 +1,4 @@
-package javaagent;
+package com.mscufmg.Zhe.javaagent;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
@@ -6,7 +6,7 @@ import java.lang.instrument.Instrumentation;
 
 import java.io.IOException;
 
-import com.mscufmg.javaagent.SQLSecurePrintStream;
+import com.mscufmg.Zhe.javaagent.SQLSecurePrintStream;
 
 public class Agent{ 
     /**

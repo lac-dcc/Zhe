@@ -2,12 +2,13 @@ package com.mscufmg.Zhe.trainer;
 
 import com.mscufmg.Zhe.trainer.SQLTree;
 import com.mscufmg.Zhe.trainer.nodes.LeafNode;
-
+import com.beust.jcommander.converters.IParameterSplitter;
 import java.io.PrintWriter;
 import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 import net.sf.jsqlparser.parser.*;
 import net.sf.jsqlparser.statement.*;
@@ -17,6 +18,12 @@ import net.sf.jsqlparser.JSQLParserException;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
+class SemiColonSplitter implements IParameterSplitter {
+    public List<String> split(String value) {
+      return Arrays.asList(value.split(";"));
+    }
+}
+
 
 /**
  * This class implements a terminal application to help using the Obfuscator.
@@ -24,7 +31,7 @@ import com.beust.jcommander.Parameters;
 @Parameters(commandDescription = "Create a obfuscation pattern given some examples")
 public class TrainerCommand
 {
-    @Parameter(names={"-q", "--queries"}, description="Input example Queries", required=true, variableArity=true)
+    @Parameter(names={"-q", "--queries"}, description="Input example Queries", required=true, variableArity=true, splitter=SemiColonSplitter.class)
     private List<String> queries;
 
     @Parameter(names={"-t", "--test"}, description="Test Obfuscaation Pattern on given Queries")
@@ -37,7 +44,7 @@ public class TrainerCommand
         try{
             return (SimpleNode) CCJSqlParserUtil.parseAST(s);
         } catch(JSQLParserException e){
-            System.out.println("Error on parsing SQL Query: Is this SQL Valid?");
+            System.out.println("Error on parsing SQL Query: Is this SQL Valid?\n" + "SQL: " + s);
             return null;
         } 
     }

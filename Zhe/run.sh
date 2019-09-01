@@ -1,11 +1,11 @@
 #!/bin/bash
-QUERY1="select email from users where id = 1 and name='gerson'"
-QUERY2="select email from users where id = (select * from table where name='alfred') and name='gerson'"
-QUERY3="select email from users where id = 12 AND name='rdolfo'"
-QUERY4="select other from users where id = 12"
-QUERY5="select other from another where id = 12"
-QUERY6="select email from users where otherid = (select * from table where name='alfred') and name='gerson'"
-QUERY7="SELECT D_NEXT_O_ID   FROM DISTRICT WHERE D_W_ID = ?    AND D_ID = ?"
+QUERY1="select email from users where id = 1 and name='gerson';"
+QUERY2="select email from users where id = (select * from table where name='alfred') and name='gerson';"
+QUERY3="select email from users where id = 12 AND name='rdolfo';"
+QUERY4="select other from users where id = 12;"
+QUERY5="select a, other from another where id = 12;"
+QUERY6="select email from users where otherid = (select * from table where name='alfred') and name='gerson';"
+QUERY7="SELECT D_NEXT_O_ID   FROM DISTRICT WHERE D_W_ID = ?    AND D_ID = ?;"
 
 SERIALIZE="java -jar target/Zhe-0.1-jar-with-dependencies.jar train -f tree.ser -q"
 REDACT="java -jar target/Zhe-0.1-jar-with-dependencies.jar train -t -f tree.ser -q"
