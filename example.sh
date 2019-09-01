@@ -7,10 +7,9 @@ QUERY5="select a, other from another where id = 12;"
 QUERY6="select email from users where otherid = (select * from table where name='alfred') and name='gerson';"
 QUERY7="SELECT D_NEXT_O_ID   FROM DISTRICT WHERE D_W_ID = ?    AND D_ID = ?;"
 
-SERIALIZE="java -jar target/Zhe-0.1-jar-with-dependencies.jar train -f tree.ser -q"
-REDACT="java -jar target/Zhe-0.1-jar-with-dependencies.jar train -t -f tree.ser -q"
+SERIALIZE="java -jar Zhe/target/Zhe-0.1-jar-with-dependencies.jar train -f tree.ser -q"
+REDACT="java -jar Zhe/target/Zhe-0.1-jar-with-dependencies.jar train -t -f tree.ser -q"
 
-mvn package
 
 echo "
 INPUT QUERIES:
