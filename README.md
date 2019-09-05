@@ -1,7 +1,7 @@
 ### Abstract
 The goal of this project is to design and implement techniques that support the fast obfuscation of literals in database queries. Such techniques must be extensible and agnostic to the underlying database technology. The original meaning of obfuscated queries must be recoverable by certified users. Here is a link to a video explaining the project:
 
-<a href="https://www.youtube.com/watch?v=MRlDpJN_WrQ" target="_blank"><img src="https://img.youtube.com/vi/MRlDpJN_WrQ/0.jpg" width="450" alt="Zhe: Promo video"/></a>
+<a href="https://www.youtube.com/watch?v=MRlDpJN_WrQ" target="_blank"><img src="https://raw.githubusercontent.com/lac-dcc/Zhe/master/imgs/video-screenshot.png" width="450" alt="Zhe: Promo video"/></a>
 
 ### Core Definitions
 **Definition [**_Event_**]**: Let M be a machine that produces an infinite sequence of characters s, and G be a grammar. A string event is the occurrence of a substring s' in s, where s' is recognized by G. G is called an event grammar.
