@@ -1,5 +1,5 @@
 ### Abstract
-The goal of this project is to design and implement techniques that support the fast obfuscation of literals in database queries. Such techniques must be extensible and agnostic to the underlying database technology. The original meaning of obfuscated queries must be recoverable by certified users. Here is a video explaining the project main idea:
+The goal of this project is to design and implement techniques that support the fast obfuscation of literals in database queries. Such techniques must be extensible and agnostic to the underlying database technology. The original meaning of obfuscated queries must be recoverable by certified users. Here is a link to a video explaining the project:
 
 <a href="https://www.youtube.com/watch?v=MRlDpJN_WrQ" target="_blank"><img src="https://img.youtube.com/vi/MRlDpJN_WrQ/0.jpg" width="450" alt="Zhe: Promo video"/></a>
 
