@@ -21,6 +21,7 @@ public class SQLSecurePrintStream extends CustomPrintStream {
     private long numStringEvents;
     private long numSQLQueries;
     private final String key;
+    private boolean decrypt;
     private final ArrayList<String> START_SQL = new ArrayList(Arrays.asList("select", "create", "update", "delete", "use", "set", "show"));
 
     /**
@@ -29,12 +30,16 @@ public class SQLSecurePrintStream extends CustomPrintStream {
      *  @param outStream: an Output Stream.
      *  @param filename:  the filename containing the SQLTree Obfuscation pattern.
      */
-    public SQLSecurePrintStream(OutputStream outStream, String filename, String key) throws IOException, ClassNotFoundException{
+    public SQLSecurePrintStream(OutputStream outStream, String filename, String key, boolean decrypt) throws IOException, ClassNotFoundException{
         super(outStream, true);
         this.pattern = SQLTree.deserialize(filename);
         this.key = key;
-    }
+        this.decrypt = decrypt;
 
+    }
+    public SQLSecurePrintStream(OutputStream outStream, String filename, String key) throws IOException, ClassNotFoundException{
+        this(outStream, filename, key, false);
+    }
     /**
      *  Parse a SQL Query.
      *
@@ -138,8 +143,12 @@ public class SQLSecurePrintStream extends CustomPrintStream {
 
         for(int i = 0; i < nodes.size(); i++){
             LeafNode node = nodes.get(i);
-            String text = sql.substring(node.getBegin(), node.getEnd());
-            String encriptText = AES.encrypt(text, this.key); 
+            String text = sql.substring(node.getBegin() -1, node.getEnd());
+            String encriptText; 
+            if (this.decrypt)
+                encriptText = AES.decrypt(text, this.key); 
+            else
+                encriptText = AES.encrypt(text, this.key); 
             resp += encriptText;
 
             if(i + 1 < nodes.size())

@@ -4,6 +4,7 @@ import com.mscufmg.Zhe.trainer.TrainerCommand;
 import com.mscufmg.Zhe.logsim.LogsimCommand;
 import com.mscufmg.Zhe.logsim.commands.NormalCommand;
 import com.mscufmg.Zhe.logsim.commands.ExponentialCommand;
+import com.mscufmg.Zhe.reader.ReaderCommand;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -18,12 +19,14 @@ public class Main {
     private void processCommandLineArguments(String[] args){
         TrainerCommand tc = new TrainerCommand();
         LogsimCommand lc = new LogsimCommand();
+        ReaderCommand rc = new ReaderCommand();
 
         final JCommander commander = JCommander.newBuilder()
             .programName("Zhe: Hide sensitive information on SQL logs")
             .addObject(this)
             .addCommand("train", tc)
             .addCommand("simulate", lc)
+            .addCommand("read", rc)
             .build();
 
         NormalCommand nc = new NormalCommand();
@@ -71,6 +74,13 @@ public class Main {
                                     commander.usage();
                                     break;
                             }
+                        }
+                        break;
+                    case "read":
+                        try{
+                            rc.run();
+                        } catch(Exception e){
+                            System.out.println("Erro when reading log: " + e);
                         }
                         break;
                 }

@@ -89,6 +89,7 @@ public class AES {
  
     public static String decrypt(String strToDecrypt, String secret)
     {
+        strToDecrypt = strToDecrypt.toUpperCase();
         try
         {
             setKey(secret);

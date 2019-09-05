@@ -6,7 +6,6 @@ import java.util.Random;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
 import com.mscufmg.Zhe.logsim.distributions.Distribution;
 import com.mscufmg.Zhe.logsim.util.Timer;
 import com.mscufmg.Zhe.logsim.util.Config;
