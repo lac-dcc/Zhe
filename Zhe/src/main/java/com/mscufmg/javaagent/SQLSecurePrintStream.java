@@ -22,7 +22,7 @@ public class SQLSecurePrintStream extends CustomPrintStream {
     private long numSQLQueries;
     private final String key;
     private boolean decrypt;
-    private final ArrayList<String> START_SQL = new ArrayList(Arrays.asList("select", "create", "update", "delete", "use", "set", "show"));
+    private final ArrayList<String> START_SQL = new ArrayList(Arrays.asList("select", "create", "update", "delete", "use", "set", "show", "SELECT", "CREATE", "UPDATE", "DELETE", "USE", "SET", "SHOW"));
 
     /**
      *  Contructor.
@@ -112,7 +112,7 @@ public class SQLSecurePrintStream extends CustomPrintStream {
 
     public String processBytes(byte[] bytes){
 
-        String s = new String(bytes).toLowerCase();
+        String s = new String(bytes);
 
         this.numStringEvents += 1;
         String sql = getSQLQuery(s.replaceAll("\\s", " ").split(" "));

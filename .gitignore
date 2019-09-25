@@ -25,3 +25,7 @@ exp_scripts
 old_results
 oltpbench
 *.log
+.env
+scripts/
+__pycache__
+*.egg-info
