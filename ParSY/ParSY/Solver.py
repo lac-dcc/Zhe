@@ -29,9 +29,6 @@ class Solver:
     """
     def __init__(self, rules, holes):
         self.rules, holes, = (rules, holes)
-        for r in rules.values():
-            print(r)
-        print("--------------")
         self.nextRuleRID = len(self.rules)
         self.states = {h: 0 for h in holes}
 

@@ -33,12 +33,10 @@ def getDefaultTemplate(hasQuery):
         H.rule = T
         rules[3] = T
         rules[4] = G
-        placeholders = [G]
     else:
         H.rule = E
-        placeholders = []
     holes = [P, E]
-    return rules, holes, placeholders
+    return rules, holes
 
 
 class Grammar(object):
@@ -63,14 +61,14 @@ class Grammar(object):
         self.rules = solver.solve(self)
 
     def merge(self, grammar):
-    """Merge another CFG with self.
+        """Merge another CFG with self.
 
 
-    Parameters
-    ----------
-    grammar: Grammar
-        The grammar to be merged.
-    """
+        Parameters
+        ----------
+        grammar: Grammar
+            The grammar to be merged.
+        """
         ids = set(self.rules.keys()) | set(grammar.rules.keys())
         for i in ids:
             r1 = self.rules.get(i, None)
