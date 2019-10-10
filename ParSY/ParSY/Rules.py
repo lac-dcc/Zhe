@@ -50,7 +50,7 @@ class Rule(ABC):
 
     @property
     def name(self):
-        return "R{}".format(self.rid)
+        return "r{}".format(self.rid)
 
     @property
     def isHole(self):
@@ -130,7 +130,7 @@ class ABRule(Rule):
         return(True, tokenA + tokenB)
 
     def __repr__(self):
-        return "{} -> R{}R{}".format(self.name, self.aRule.rid, self.bRule.rid)
+        return "{} \n : r{} r{}\n ;".format(self.name, self.aRule.rid, self.bRule.rid)
 
 
 class TerminalRule(Rule):
@@ -159,7 +159,7 @@ class TerminalRule(Rule):
         return(matched, [(matched, self.rid, self.terminal, *token)])
 
     def __repr__(self):
-        return "{} -> {}".format(self.name, self.terminal)
+        return "{}\n : {}\n ;".format(self.name, self.terminal)
 
 
 class Hole(Rule):
@@ -201,8 +201,8 @@ class Hole(Rule):
 
     def __repr__(self):
         if self.rule is not None:
-            return "{} -> {}".format(self.name, self.rule.name)
-        return "{} -> ??".format(self.name)
+            return "{} \n : {}\n ;".format(self.name, self.rule.name)
+        return "{} : ??;".format(self.name)
 
 
 class CompositionRule(Rule):
@@ -253,7 +253,7 @@ class CompositionRule(Rule):
         return(False, wrongPaths)
 
     def __repr__(self):
-        strRules = str(self.rules[0]).split(' -> ')[1]
+        strRules = str(self.rules[0]).split(' : ')[1][:-1]
         for r in self.rules[1:]:
-            strRules += " | " + str(r).split(' -> ')[1]
-        return "R{} -> {}".format(self.rid, strRules)
+            strRules += " | " + str(r).split(' : ')[1][:-1]
+        return "r{}\n : {}\n ;".format(self.rid, strRules)

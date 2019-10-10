@@ -123,7 +123,7 @@ class Grammar(object):
         -------
         (boolean, str, int): Was the token matched, the token matched, the token position.
         """
-        matchToken = self.tokens[self.curToken] if self.curToken < len(self.tokens) else "\\epsilon"
+        matchToken = self.tokens[self.curToken] if self.curToken < len(self.tokens) else "/* epsilon */"
 
         if token == '<*>' or token == matchToken:
             self.curToken += 1

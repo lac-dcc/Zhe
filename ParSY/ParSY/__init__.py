@@ -1,2 +1,2 @@
-from Grammar import Grammar
-from Tokenizer import Tokenizer
+from .Grammar import Grammar
+from .Tokenizer import Tokenizer
