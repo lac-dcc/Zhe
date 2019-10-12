@@ -1,5 +1,8 @@
 package com.mscufmg.Zhe.javaagent; 
 
+import org.antlr.v4.runtime.RuleContext;
+
+import com.mscufmg.Zhe.trainer.ParserFacade;
 import com.mscufmg.Zhe.trainer.SQLTree;
 import com.mscufmg.Zhe.trainer.nodes.LeafNode;
 
@@ -18,6 +21,8 @@ import net.sf.jsqlparser.JSQLParserException;
 public class SQLSecurePrintStream extends CustomPrintStream {
 
     private SQLTree pattern;
+    private String grammarRoot; 
+    private ParserFacade facade;
     private long numStringEvents;
     private long numSQLQueries;
     private final String key;
@@ -32,9 +37,11 @@ public class SQLSecurePrintStream extends CustomPrintStream {
      */
     public SQLSecurePrintStream(OutputStream outStream, String filename, String key, boolean decrypt) throws IOException, ClassNotFoundException{
         super(outStream, true);
+        this.facade = new ParserFacade(this.grammarRoot);
         this.pattern = SQLTree.deserialize(filename);
         this.key = key;
         this.decrypt = decrypt;
+        this.grammarRoot = "/Users/joaosaffran/Research/Zhe/grammar";
 
     }
     public SQLSecurePrintStream(OutputStream outStream, String filename, String key) throws IOException, ClassNotFoundException{
@@ -45,8 +52,12 @@ public class SQLSecurePrintStream extends CustomPrintStream {
      *
      *  @param s: the SQL Query to parse.
      */
-    private SimpleNode parse(String s) throws JSQLParserException {
+    private SimpleNode jSQLParse(String s) throws JSQLParserException {
         return (SimpleNode) CCJSqlParserUtil.parseAST(s);
+    }
+
+    private RuleContext antlrParse(String s) throws Exception {
+        return this.facade.parse(s);
     }
 
     public void write (byte[] buffer, int offset, int len)
@@ -111,22 +122,22 @@ public class SQLSecurePrintStream extends CustomPrintStream {
         }
 
     public String processBytes(byte[] bytes){
-
+        
         String s = new String(bytes);
 
         this.numStringEvents += 1;
         String sql = getSQLQuery(s.replaceAll("\\s", " ").split(" "));
 
-        SimpleNode SQLNode = null;
+        RuleContext SQLNode = null;
         try {
-            SQLNode = this.parse(sql);
-        } catch (JSQLParserException e) {}
+            SQLNode = this.antlrParse(sql);
+        } catch (Exception e) {}
 
         String output = s;
 
         if(SQLNode != null){
             this.numSQLQueries += 1;
-            String newSQL = this.formatSQL(new SQLTree(SQLNode), sql);
+            String newSQL = this.formatSQL(new SQLTree(SQLNode, this.facade.getRulesNames()), sql);
             output = s.replace(sql, newSQL);
         } 
         return output;
@@ -237,7 +248,7 @@ public class SQLSecurePrintStream extends CustomPrintStream {
 
     private boolean isValidSQL(String sql){
         try{
-            this.parse(sql); 
+            this.antlrParse(sql); 
         } catch(Exception e){
             return false;
         }

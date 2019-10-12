@@ -9,6 +9,10 @@ import com.mscufmg.Zhe.trainer.nodes.NodesIterator;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.parser.Token;
 
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
+import org.antlr.v4.runtime.tree.ParseTree;
+
 import java.util.ArrayList;
 
 import java.io.Serializable;
@@ -51,7 +55,12 @@ public class SQLTree implements Serializable {
         this();
         this.parseTreeFromSimpleNode(node, (InternalNode) this.root);
     }
-    
+
+    public SQLTree(RuleContext node, String[] rulesNames){
+        this();
+        this.parseTreeFromRuleContext(node, (InternalNode) this.root, rulesNames);
+    }
+
     /**
      * Root node getter.
      *
@@ -90,7 +99,7 @@ public class SQLTree implements Serializable {
         this.mergeNodes(this.getRoot().getChild(0), value.getRoot().getChild(0), newRoot);
         return new SQLTree(newRoot);
     }
-    
+
     /**
      *  Auxiliar method to transverse two SQLTrees mergin it's nodes.
      *
@@ -100,18 +109,18 @@ public class SQLTree implements Serializable {
      */
     private void mergeNodes(Node value, Node pattern, Node parent){
         Node newNode = value.merge(pattern);
-        
+
         if(!(newNode.isEmpty()))
             parent.addChild(newNode);
 
         int numChildren = Math.min(value.getNumChildren(), pattern.getNumChildren());
-        
+
         for(int i = 0; i < numChildren; i++){
             Node child = value.getChild(i);
             this.mergeNodes(child, pattern.getChild(i), newNode);
         }
     }
-    
+
     /**
      *  Convert a SimpleNodeTree to a SQLTree
      *
@@ -130,6 +139,44 @@ public class SQLTree implements Serializable {
             for(int i = 0; i < numChildren; i++) {
                 SimpleNode child = (SimpleNode)(node.jjtGetChild(i));
                 this.parseTreeFromSimpleNode(child, newNode);
+            }
+        }    
+        parent.addChild(newNode);
+    }
+
+    private void parseTreeFromRuleContext(RuleContext node, Node parent, String[] rulesName) {
+        int numChildren = node.getChildCount();
+        Node newNode = new InternalNode(parent, rulesName[node.getRuleIndex()], 
+                    0, 
+                    0);
+
+        for(int i = 0; i < numChildren; i++) {
+            ParseTree child = node.getChild(i);
+            if (child instanceof RuleContext){
+                this.parseTreeFromRuleContext((RuleContext)child, newNode, rulesName);
+            }else if(child instanceof TerminalNodeImpl){
+                this.parseTreeFromRuleContext((TerminalNodeImpl)child, newNode);
+            }
+        }
+        parent.addChild(newNode);
+    }
+
+    private void parseTreeFromRuleContext(TerminalNodeImpl node, Node parent) {
+        int numChildren = node.getChildCount();
+        Node newNode;
+
+        if(numChildren == 0) {
+            newNode = new LeafNode(parent, node.toString(), 
+                    node.getPayload().getStartIndex() + 1, 
+                    node.getPayload().getStopIndex() + 1);
+        } else {
+            newNode = new InternalNode(parent, node.toString(), 
+                   0, 
+                    0);
+
+            for(int i = 0; i < numChildren; i++) {
+                ParseTree child = node.getChild(i);
+                this.parseTreeFromRuleContext((TerminalNodeImpl)child, newNode);
             }
         }    
         parent.addChild(newNode);
@@ -167,7 +214,7 @@ public class SQLTree implements Serializable {
 
         System.out.println("Object has been serialized");
     }
-    
+
     /**
      *  Loads a serialize SQLTree
      *
@@ -180,11 +227,11 @@ public class SQLTree implements Serializable {
         ObjectInputStream in = new ObjectInputStream(file);
 
         resp = (SQLTree) in.readObject();
-        
+
         in.close();
         file.close();
         System.out.println("Object has been deserialized");
-        
+
         return resp;
     }
 
@@ -196,7 +243,7 @@ public class SQLTree implements Serializable {
     public String toString() {
         return this.toString(this.root, "");
     }
-    
+
     /**
      *  Helper method to transverse this SQLTree and turnit into a String.
      *

@@ -29,3 +29,7 @@ oltpbench
 scripts/
 __pycache__
 *.egg-info
+*/grammar/*.java
+*.interp
+*.tokens
+*/grammar/*.class

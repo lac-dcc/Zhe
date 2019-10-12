@@ -1,5 +1,11 @@
 package com.mscufmg.Zhe;
 
+import com.mscufmg.Zhe.trainer.ParserFacade;
+import com.mscufmg.Zhe.trainer.SQLTree;
+
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
+
 import com.mscufmg.Zhe.trainer.TrainerCommand;
 import com.mscufmg.Zhe.logsim.LogsimCommand;
 import com.mscufmg.Zhe.logsim.commands.NormalCommand;
@@ -9,6 +15,8 @@ import com.mscufmg.Zhe.reader.ReaderCommand;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.MissingCommandException;
+
+import java.io.File;
 
 
 public class Main {
@@ -92,8 +100,16 @@ public class Main {
      *
      * @param arguments Command-line arguments.
      */
+
     public static void main(final String[] arguments)
     {
         new Main().processCommandLineArguments(arguments);
+        // try{
+        //     ParserFacade facade = new ParserFacade("/Users/joaosaffran/Research/Zhe/grammar");
+        //     RuleContext ctx = facade.parse("Sbananan");
+        //     System.out.println(new SQLTree(ctx, facade.getRulesNames()));
+        // } catch (Exception e){
+        //     e.printStackTrace();
+        // }
     }
 }

@@ -1,7 +1,11 @@
 package com.mscufmg.Zhe.trainer;
 
+import org.antlr.v4.runtime.RuleContext;
+
 import com.mscufmg.Zhe.trainer.SQLTree;
+import com.mscufmg.Zhe.trainer.ParserFacade;
 import com.mscufmg.Zhe.trainer.nodes.LeafNode;
+
 import com.beust.jcommander.converters.IParameterSplitter;
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -40,10 +44,10 @@ public class TrainerCommand
     @Parameter(names={"-f", "--filename"}, description="Obfuscation Pattern filename")
     private String filename = "Tree.ser";
 
-    private SimpleNode parse(String s) {
+    private RuleContext parse(String s, ParserFacade facate) {
         try{
-            return (SimpleNode) CCJSqlParserUtil.parseAST(s);
-        } catch(JSQLParserException e){
+            return (RuleContext) facate.parse(s.toLowerCase());
+        } catch(Exception e){
             System.out.println("Error on parsing SQL Query: Is this SQL Valid?\n" + "SQL: " + s);
             return null;
         } 
@@ -58,6 +62,7 @@ public class TrainerCommand
     }
 
     private void test(String obfsPattern, List<String> queries){
+        ParserFacade facate = new ParserFacade("/Users/joaosaffran/Research/Zhe/grammar");
         SQLTree tree;
         try{
             tree = SQLTree.deserialize(obfsPattern);
@@ -69,12 +74,12 @@ public class TrainerCommand
             return;
         }
         for(String query : queries){
-            SQLTree sql = new SQLTree(parse(query));
+            SQLTree sql = new SQLTree(parse(query, facate), facate.getRulesNames());
             if(tree.matches(sql)) {
                 String newSQL = query; 
 
                 for(LeafNode node : tree.getSensitiveLiterals(sql))
-                    newSQL = redact(newSQL, node);
+                    newSQL = redact(newSQL.toLowerCase(), node);
 
                 System.out.println("+ " + query + "\n" + "= "+ newSQL + "\n");
             } else {
@@ -84,13 +89,14 @@ public class TrainerCommand
     }
 
     private void train(List<String> queries, String outFile){
-        SQLTree similarity = new SQLTree(parse(queries.get(0)));
+        ParserFacade facate = new ParserFacade("/Users/joaosaffran/Research/Zhe/grammar");
+        SQLTree similarity = new SQLTree(parse(queries.get(0), facate), facate.getRulesNames());
 
         for(int i = 1; i< queries.size(); i++){
-            SQLTree tree = new SQLTree(parse(queries.get(i)));
+            SQLTree tree = new SQLTree(parse(queries.get(i), facate), facate.getRulesNames());
             similarity = similarity.merge(tree);
         }
-        System.out.println(similarity);
+        // System.out.println(similarity);
         try{
             similarity.serialize(outFile);
         } catch (IOException e){
