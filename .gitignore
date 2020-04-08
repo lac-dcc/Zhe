@@ -1,35 +1,28 @@
-target
-.DS_Store
-peercoder
-program_synthesys
-target
-examples
-run_examples.sh
-experiments
-scratch
-*.ser
-*/test/*
-*.txt
 .vscode
 .classpath
 .project
 .settings
-*/experiment
-.ipynb_checkpoints/
-venv
-*.csv
-srini_sample
-analysis
-logsim/results/*
-exp_scripts
-old_results
-oltpbench
-*.log
-.env
-scripts/
-__pycache__
-*.egg-info
-*/grammar/*.java
-*.interp
-*.tokens
-*/grammar/*.class
+*/bin/*
+.gradle
+*/build/*
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
+
+# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
+# gradle/wrapper/gradle-wrapper.properties
