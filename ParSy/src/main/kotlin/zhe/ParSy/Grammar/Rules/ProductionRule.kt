@@ -19,8 +19,10 @@ class ProductionRule(val id: Int, val rules:Set<IRule>) : AbstractRule() {
     override fun match (tkns: List<String>
                        , ruleTable: RulesMap
                        ): Boolean {
-        
-        val aux: Boolean = this.rules.any({rule: IRule -> rule.match(tkns, ruleTable)})
+
+        val aux: Boolean = this.rules.any({rule: IRule -> 
+            rule.match(tkns, ruleTable)
+        })
         return aux
     }
 

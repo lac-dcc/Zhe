@@ -11,11 +11,10 @@ class ABRule(var lRuleId: Int, var rRuleId: Int) : AbstractRule() {
         if(tkns.isEmpty())
             return false
         
-        
         val aRuleResp: Boolean = ruleTable[this.lRuleId]!!.match(tkns, ruleTable)
-        
-        val newTkns: List<String> = tkns.slice(1 .. tkns.size -1)
-        val bRuleResp: Boolean = ruleTable[this.lRuleId]!!.match(newTkns, ruleTable)
+
+        val newTkns: List<String> = tkns.drop(1)
+        val bRuleResp: Boolean = ruleTable[this.rRuleId]!!.match(newTkns, ruleTable)
         
         return aRuleResp && bRuleResp
     } 
