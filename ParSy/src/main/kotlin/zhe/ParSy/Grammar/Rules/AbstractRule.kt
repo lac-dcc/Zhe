@@ -11,4 +11,6 @@ abstract class AbstractRule : IRule {
     override fun hashCode() : Int {
         return ("$this").hashCode()
     }
+    override abstract fun equals(other: Any?): Boolean
+
 }
