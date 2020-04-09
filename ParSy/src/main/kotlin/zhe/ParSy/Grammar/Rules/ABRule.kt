@@ -12,9 +12,7 @@ class ABRule(var lRuleId: Int, var rRuleId: Int) : AbstractRule() {
             return false
         
         val aRuleResp: Boolean = ruleTable[this.lRuleId]!!.match(tkns, ruleTable)
-
-        val newTkns: List<String> = tkns.drop(1)
-        val bRuleResp: Boolean = ruleTable[this.rRuleId]!!.match(newTkns, ruleTable)
+        val bRuleResp: Boolean = ruleTable[this.rRuleId]!!.match(tkns.drop(1), ruleTable)
         
         return aRuleResp && bRuleResp
     } 
