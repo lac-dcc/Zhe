@@ -15,7 +15,7 @@ public class HeapCNFGrammar : IGrammar{
         var output: String = ""
         rules.forEach { 
             _, rule ->
-                output += rule.toString()
+                output += rule.toString() + "\n"
         }
         return output
     }

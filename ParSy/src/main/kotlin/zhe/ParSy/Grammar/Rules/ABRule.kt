@@ -5,21 +5,18 @@ import zhe.ParSy.Grammar.RulesMap
 
 class ABRule(var lRuleId: Int, var rRuleId: Int) : AbstractRule() {
 
-    override fun match (tkns: MutableList<String>
+    override fun match (tkns: List<String>
                        , ruleTable: RulesMap
                        ): Boolean {
         if(tkns.isEmpty())
             return false
         
-        val headTkn: String = tkns[0]
-        val aRuleResp: Boolean = ruleTable[this.lRuleId]!!.match(tkns, ruleTable)
-        var bRuleResp: Boolean = false
         
-        if(aRuleResp){
-            bRuleResp = ruleTable[this.rRuleId]!!.match(tkns, ruleTable)
-            if(!bRuleResp)
-                tkns.add(0, headTkn)
-        }
+        val aRuleResp: Boolean = ruleTable[this.lRuleId]!!.match(tkns, ruleTable)
+        
+        val newTkns: List<String> = tkns.slice(1 .. tkns.size -1)
+        val bRuleResp: Boolean = ruleTable[this.lRuleId]!!.match(newTkns, ruleTable)
+        
         return aRuleResp && bRuleResp
     } 
     

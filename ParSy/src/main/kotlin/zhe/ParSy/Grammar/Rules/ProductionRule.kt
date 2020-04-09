@@ -16,11 +16,12 @@ class ProductionRule(val id: Int, val rules:Set<IRule>) : AbstractRule() {
         return ProductionRule(nid, nRules)
     }
 
-    override fun match (tkns: MutableList<String>
+    override fun match (tkns: List<String>
                        , ruleTable: RulesMap
                        ): Boolean {
-
-        return this.rules.any({rule: IRule -> rule.match(tkns, ruleTable)})
+        
+        val aux: Boolean = this.rules.any({rule: IRule -> rule.match(tkns, ruleTable)})
+        return aux
     }
 
     override fun toString() : String {
@@ -30,7 +31,7 @@ class ProductionRule(val id: Int, val rules:Set<IRule>) : AbstractRule() {
                 output += " | "
             output += rule.toString()
         })
-        return output + "\n"
+        return output
     }
 
     override fun equals(other: Any?): Boolean {

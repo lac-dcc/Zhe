@@ -4,7 +4,7 @@ import zhe.ParSy.Grammar.RulesMap
 
 abstract class AbstractRule : IRule {
 
-    override abstract fun match (tkns: MutableList<String>
+    override abstract fun match (tkns: List<String>
                                 , ruleTable: RulesMap
                                 ): Boolean
 

@@ -6,19 +6,11 @@ import zhe.ParSy.Grammar.RulesMap
 
 class TerminalRule(var pattern:String?) : AbstractRule() {
 
-    override fun match (tkns: MutableList<String>
+    override fun match (tkns: List<String>
                        , ruleTable: RulesMap
-                       ): Boolean {
+                       ): Boolean { 
 
-        if(tkns.isEmpty())
-            return false
-
-        val tkn: String = tkns[0]
-        
-        if(tkn == pattern)
-            tkns.removeAt(0)
-        
-        return tkn == pattern
+        return !tkns.isEmpty() && tkns.first() == pattern
     }
 
     override fun toString() : String {

@@ -14,7 +14,7 @@ public class HeapCNFMerger : IMerger {
 
         val numRules: Int = max(grammar.rules.entries.size, other.rules.entries.size)
 
-        for(i in 0 until numRules){
+        for(i in 0 until numRules) {
             val g1: ProductionRule = other.rules.getOrDefault(i, ProductionRule(i))
             val g2: ProductionRule = grammar.rules.getOrDefault(i, ProductionRule(i))
 

@@ -45,7 +45,7 @@ fun main(args:Array<String>){
 
     for(s in arguments){
         print("Parsing $s => ")
-        println(parser.parse(s.split(" ").toMutableList(), g1))
+        println(parser.parse(s.split(" ").toList(), g1))
     }
    
 }
