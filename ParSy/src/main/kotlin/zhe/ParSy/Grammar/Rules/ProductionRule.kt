@@ -20,10 +20,9 @@ class ProductionRule(val id: Int, val rules:Set<IRule>) : AbstractRule() {
                        , ruleTable: RulesMap
                        ): Boolean {
 
-        val aux: Boolean = this.rules.any({rule: IRule -> 
+        return this.rules.any({rule: IRule -> 
             rule.match(tkns, ruleTable)
         })
-        return aux
     }
 
     override fun toString() : String {
