@@ -1,10 +1,9 @@
 package zhe.ParSy.Solver
 
-import zhe.ParSy.Grammar.Rules.ProductionRule
-import zhe.ParSy.Grammar.Rules.RuleFactory
+import zhe.ParSy.Grammar.Rule.ProductionRule
+import zhe.ParSy.Factory.RuleFactory
 import zhe.ParSy.Grammar.IGrammar
 import zhe.ParSy.Grammar.HeapCNFGrammar
-import zhe.ParSy.Grammar.RulesMap 
 import zhe.ParSy.Grammar.MutableRulesMap 
 
 import java.util.Stack

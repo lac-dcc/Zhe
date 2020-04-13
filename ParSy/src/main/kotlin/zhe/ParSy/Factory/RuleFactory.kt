@@ -1,4 +1,8 @@
-package zhe.ParSy.Grammar.Rules
+package zhe.ParSy.Factory
+
+import zhe.ParSy.Grammar.Rule.ProductionRule
+import zhe.ParSy.Grammar.Rule.ABRule
+import zhe.ParSy.Grammar.Rule.TerminalRule
 
 class RuleFactory(val maxRules: Int) {
     var index: Int

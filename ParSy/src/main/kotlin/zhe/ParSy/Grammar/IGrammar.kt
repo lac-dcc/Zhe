@@ -1,9 +1,9 @@
 package zhe.ParSy.Grammar
 
-import zhe.ParSy.Grammar.Rules.ProductionRule
-import zhe.ParSy.Grammar.Rules.IRule
+import zhe.ParSy.Grammar.Rule.ProductionRule
+import zhe.ParSy.Grammar.Rule
 
 interface IGrammar {
     val rules: Map<Int, ProductionRule>
-    val root: IRule
+    val root: Rule
 }

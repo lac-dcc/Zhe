@@ -1,10 +1,10 @@
 package zhe.ParSy.Grammar
 
-import zhe.ParSy.Grammar.Rules.IRule
+import zhe.ParSy.Grammar.Rule
 
 public class HeapCNFGrammar : IGrammar{
     override val rules: RulesMap
-    override val root: IRule
+    override val root: Rule
         get() = this.rules[0]!!
 
     constructor(rules: RulesMap) {
