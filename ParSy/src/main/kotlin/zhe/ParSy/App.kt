@@ -47,15 +47,4 @@ fun main(args:Array<String>){
         print("Parsing $s => ")
         println(parser.parse(s.split(" ").toList(), g1))
     }
-
-    val otheTest: List<String> = listOf("Ola eu sou um test"
-                                 , "a 2"
-                                 , "banana azul"
-                                 , "b 1"
-                                 , "a 3 %"
-                                 )
-    for(s in otheTest){
-        print("Parsing $s => ")
-        println(parser.parse(s.split(" ").toList(), g1))
-    }
 }
