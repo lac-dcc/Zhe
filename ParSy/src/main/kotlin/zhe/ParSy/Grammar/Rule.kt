@@ -14,10 +14,6 @@ sealed class Rule() {
                 return false
             return other.pattern == this.pattern
         }
-
-        override fun hashCode() : Int {
-            return ("$this").hashCode()
-        }
     }
 
     class ABRule(var lRuleId: Int, var rRuleId: Int) : Rule() {
@@ -31,10 +27,6 @@ sealed class Rule() {
                 return false
             
             return other.lRuleId == this.lRuleId && other.rRuleId == this.rRuleId
-        }
-
-        override fun hashCode() : Int {
-            return ("$this").hashCode()
         }
     }
 
@@ -65,9 +57,9 @@ sealed class Rule() {
                 && this.rules.size == nOther.rules.size 
                 && this.rules.union(nOther.rules).size == this.rules.size
         }
+    }
 
-        override fun hashCode() : Int {
-            return ("$this").hashCode()
-        }
+    override fun hashCode() : Int {
+        return ("$this").hashCode()
     }
 }

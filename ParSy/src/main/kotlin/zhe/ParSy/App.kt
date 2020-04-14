@@ -12,6 +12,8 @@ import zhe.ParSy.Parser.IParser
 import zhe.ParSy.Merger.IMerger
 import zhe.ParSy.Merger.HeapCNFMerger
 
+import zhe.ParSy.Metrics.NumberOfSentencesInGrammar
+
 import java.util.Stack
 
 
@@ -24,6 +26,7 @@ fun main(args:Array<String>){
     val tokens: Stack<String> = Stack<String>()
     
     var index: Int = 0
+    
     while(args[index].length <= 0)
         index += 1
         
@@ -43,8 +46,7 @@ fun main(args:Array<String>){
     }
     println(g1)
 
-    for(s in arguments){
-        print("Parsing $s => ")
-        println(parser.parse(s.split(" ").toList(), g1))
-    }
+    
+    val numSentencesInGrammar: Double = NumberOfSentencesInGrammar(g1).count()
+    print("${arguments.size} $numSentencesInGrammar ${arguments.size/numSentencesInGrammar}")
 }

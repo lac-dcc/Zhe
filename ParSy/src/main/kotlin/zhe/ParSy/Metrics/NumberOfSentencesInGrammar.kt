@@ -1,0 +1,21 @@
+package zhe.ParSy.Metrics
+
+import zhe.ParSy.Grammar.IGrammar
+import zhe.ParSy.Grammar.Rule
+import zhe.ParSy.Grammar.Rule.TerminalRule
+import zhe.ParSy.Grammar.Rule.ABRule
+import zhe.ParSy.Grammar.Rule.ProductionRule
+
+
+class NumberOfSentencesInGrammar(val grammar: IGrammar){
+
+    fun count(): Double = count(grammar.root)
+
+    fun count(rule: Rule): Double {
+        return when(rule){
+            is TerminalRule -> 1.0
+            is ABRule -> count(grammar.rules[rule.lRuleId]!!) * count(grammar.rules[rule.rRuleId]!!)
+            is ProductionRule -> rule.rules.map({r -> count(r)}).reduce { agg, v -> agg + v}
+        }
+    }
+}
