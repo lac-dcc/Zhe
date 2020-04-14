@@ -59,6 +59,10 @@ sealed class Rule() {
         }
     }
 
+
+    override abstract fun toString() : String
+    override abstract fun equals(other:Any?) : Boolean
+    
     override fun hashCode() : Int {
         return ("$this").hashCode()
     }
