@@ -17,8 +17,8 @@ class Parser : IParser {
         return !tkns.isEmpty() && 
         when(node){
             is TerminalRule -> tkns.first() == node.pattern
-            is ABRule -> parse(grammar.rules[node.lRuleId]!!, tkns.drop(0), grammar) &&
-                         parse(grammar.rules[node.rRuleId]!!, tkns.drop(1), grammar)
+            is ABRule -> parse(node.lRule(grammar.rules), tkns.drop(0), grammar) &&
+                         parse(node.rRule(grammar.rules), tkns.drop(1), grammar)
             is ProductionRule -> node.rules.any({rule: Rule -> parse(rule, tkns, grammar)})
         }
 

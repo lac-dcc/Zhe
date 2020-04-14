@@ -14,8 +14,8 @@ class NumberOfSentencesInGrammar(val grammar: IGrammar){
     fun count(rule: Rule): Double {
         return when(rule){
             is TerminalRule -> 1.0
-            is ABRule -> count(grammar.rules[rule.lRuleId]!!) * count(grammar.rules[rule.rRuleId]!!)
-            is ProductionRule -> rule.rules.map({r -> count(r)}).reduce { agg, v -> agg + v}
+            is ABRule -> count(rule.lRule(grammar.rules)) * count(rule.rRule(grammar.rules))
+            is ProductionRule -> rule.rules.map { r -> count(r) }.reduce { agg, v -> agg + v}
         }
     }
 }

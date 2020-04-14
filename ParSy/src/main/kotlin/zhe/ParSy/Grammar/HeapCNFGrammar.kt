@@ -13,8 +13,7 @@ public class HeapCNFGrammar : IGrammar{
 
     override fun toString() : String {
         var output: String = ""
-        rules.forEach { 
-            _, rule ->
+        rules.forEach { _, rule ->
                 output += rule.toString() + "\n"
         }
         return output

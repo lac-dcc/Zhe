@@ -16,7 +16,15 @@ sealed class Rule() {
         }
     }
 
-    class ABRule(var lRuleId: Int, var rRuleId: Int) : Rule() {
+    class ABRule(private var lRuleId: Int, private var rRuleId: Int) : Rule() {
+
+        fun lRule(table: RulesMap) : Rule {
+            return table[this.lRuleId]!!
+        }
+
+        fun rRule(table: RulesMap) : Rule {
+            return table[this.rRuleId]!!
+        }
 
         override fun toString() : String {
             return "R${lRuleId} R${rRuleId}"
