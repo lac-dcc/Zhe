@@ -1,3 +1,9 @@
+### How to cite our work:
+João Saffran, Haniel Barbosa, Fernando Magno Quintão Pereira, Srinivas
+Vladamani:
+On-line synthesis of parsers for string events. J. Comput. Lang. 62:
+101022 (2021)
+
 ### Abstract
 The goal of this project is to design and implement techniques that support the fast obfuscation of literals in database queries. Such techniques must be extensible and agnostic to the underlying database technology. The original meaning of obfuscated queries must be recoverable by certified users. Here is a link to a video explaining the project:
 
