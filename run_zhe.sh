@@ -12,7 +12,7 @@ if [ ! -f "$zhe_jar" ]; then
     echo "Unable to find Zhefuscator JAR" && exit 1
 fi
 
-logs_sep_by_space=$(head -20 "$log_file" | awk -e '{printf "\x27"$0"\x27 "}')
+logs_sep_by_space=$(head -40 "$log_file" | awk -e '{printf "\x27"$0"\x27 "}')
 
 eval java -jar "$zhe_jar" "$logs_sep_by_space"
 

@@ -16,39 +16,53 @@ public class HeapCNFMerger : IMerger {
 	private val regexLattice = Lattice()
     }
 
-    private fun compressRuleSet(rules: Set<Rule>): Set<Rule> {
+    fun compressRuleSet(rules: Set<Rule>): Set<Rule> {
 	if (rules.size < 2) {
 	    return rules
 	}
 
 	println("Compressing rules ${rules}")
 
-	var compressedRules = mutableSetOf<Rule>()
+	var compressedRules = setOf<TerminalRule>()
+	var otherRules = mutableSetOf<Rule>()
 	var prevRegex = ""
 	rules.forEach { rule ->
-	    if (rule is TerminalRule) {
-		val resultRuleRegex = regexLattice.transform(prevRegex,
-							     rule.toString())
-		if (resultRuleRegex == ".*") {
-		    println("Got to top! prevRegex: $prevRegex")
-		    println("Got to top! rule.toString(): ${rule.toString()}")
-		    compressedRules.plusAssign(TerminalRule(prevRegex))
-		    prevRegex = rule.toString()
-		} else {
-		    println("Did not get to top! resultRuleRegex: $resultRuleRegex")
-		    prevRegex = resultRuleRegex
-		}
-	    } else {
-		compressedRules.plusAssign(rule)
+	    println("In new iteration in outer forEach")
+
+	    if (rule !is TerminalRule) {
+		otherRules.plusAssign(rule)
+		return@forEach
 	    }
-	}
-	if (prevRegex != "") {
-	    compressedRules.plusAssign(TerminalRule(prevRegex))
+
+	    if (compressedRules.size == 0) {
+		println("Compressed rules is empty")
+		compressedRules = setOf<TerminalRule>(rule)
+		return@forEach
+	    }
+
+	    var newCompressedRules = mutableSetOf<TerminalRule>()
+	    var curRegex = rule.toString()
+	    compressedRules.forEach { prevRule -> 
+		println("In new iteration in inner forEach. Previous rule: ${prevRule.toString()}")
+		prevRegex = prevRule.toString()
+                val resultRuleRegex = regexLattice.transform(prevRegex, curRegex)
+		if (resultRuleRegex == regexLattice.top.rule) {
+		    println("Went to top!")
+		    newCompressedRules.plusAssign(TerminalRule(prevRegex))
+		    return@forEach
+		} else {
+		    curRegex = resultRuleRegex
+		}
+	    }
+	    newCompressedRules.plusAssign(TerminalRule(curRegex))
+
+	    compressedRules = newCompressedRules
 	}
 
 	println("Compressed rules: ${compressedRules}")
+	println("Other rules: ${otherRules}")
 
-	return compressedRules
+	return compressedRules.union(otherRules)
     }
 
     override fun merge(grammar: IGrammar, other: IGrammar) : IGrammar {
