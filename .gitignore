@@ -29,6 +29,7 @@ gradle-app.setting
 
 # Emacs
 *~
+*#*
 
 # Example log files
 *.log

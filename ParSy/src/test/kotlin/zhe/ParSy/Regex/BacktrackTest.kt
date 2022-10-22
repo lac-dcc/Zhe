@@ -11,7 +11,7 @@ class BacktrackTest {
 	val token = "123.456.789"
 	val tokenIdx = 1
 
-	val actual = lattice.backtrackOne(token, tokenIdx)
+	val actual = lattice.backtrack(token, tokenIdx)
 	val expected = Lattice.BacktrackResult("\\d*", 0, 3, lattice.top)
 
 	assertThat(actual.regex).isEqualTo(expected.regex)
@@ -24,7 +24,7 @@ class BacktrackTest {
 	val token = "\\d*:\\d*:\\d*"
 	val tokenIdx = 0
 
-	val actual = lattice.backtrackOne(token, tokenIdx)
+	val actual = lattice.backtrack(token, tokenIdx)
 	val expected = Lattice.BacktrackResult("\\d*", 0, 3, lattice.top)
 
 	assertThat(actual.regex).isEqualTo(expected.regex)

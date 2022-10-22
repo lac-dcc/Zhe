@@ -16,6 +16,10 @@ public class HeapCNFMerger : IMerger {
 	private val regexLattice = Lattice()
     }
 
+    // compressRuleSet takes a set of rules as an input, and returns the
+    // compressed version of these rules. By compressed we mean that we try to
+    // merge the rules into regex expressions as much as possible (as long as
+    // the merge result isn't the lattice top).
     fun compressRuleSet(rules: Set<Rule>): Set<Rule> {
 	if (rules.size < 2) {
 	    return rules

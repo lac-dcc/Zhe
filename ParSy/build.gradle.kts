@@ -12,7 +12,8 @@ repositories {
 plugins {
     kotlin("jvm") version "1.7.10"
 
-    // Apply the application plugin to add support for building a CLI application.
+    // Apply the application plugin to add support for building a CLI
+    // application.
     application
 }
 

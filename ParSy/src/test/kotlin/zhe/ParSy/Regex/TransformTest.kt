@@ -3,6 +3,8 @@ package zhe.ParSy.Regex
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
+// TODO: add tests to test Inference Machine properties (iterative, set-driven,
+// etc) -aholmquist 2022-10-22
 class TransformTest {
     private val lattice = Lattice()
 

@@ -76,6 +76,8 @@ class Lattice {
 	}
     }
 
+    // TODO: improve efficiency of meet! The current method is very very slow
+    // -aholmquist 2022-10-22
     fun meet(n1: Node, n2: Node): Node {
 	val alln1 = allParents(n1)
 	val alln2 = allParents(n2)
@@ -128,12 +130,12 @@ class Lattice {
 		    tokenIdx = 0
 		}
 
-		val finalResult = backtrackOne(finalRegex, finalRegex.length -
+		val finalResult = backtrack(finalRegex, finalRegex.length -
 					       parseTokenSuffix(
 						   finalRegex,
 						   finalRegex.length).length)
-		val prevResult = backtrackOne(prevRegex, prevRegexIdx)
-		val tokenResult = backtrackOne(token, tokenIdx)
+		val prevResult = backtrack(prevRegex, prevRegexIdx)
+		val tokenResult = backtrack(token, tokenIdx)
 
 		// Meet all of them
 		var lubBacktrack = meet(finalResult.node, prevResult.node)
@@ -195,7 +197,7 @@ class Lattice {
 			       val right: Int,
 			       val node: Node)
 
-    fun backtrackOne(s: String, prevOffset: Int): BacktrackResult {
+    fun backtrack(s: String, prevOffset: Int): BacktrackResult {
 	var curNode = Node.allNodes.getValue(parseTokenPrefix(s, prevOffset))
 	var offset: Int = prevOffset
 
