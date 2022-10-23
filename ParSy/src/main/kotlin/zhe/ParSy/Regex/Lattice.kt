@@ -2,6 +2,8 @@ package zhe.ParSy.Regex
 
 import kotlin.math.min
 
+class Rule(val pattern: String) {}
+
 class Node(val rule: String, val parents: Set<Node>, val level: Int) {
     private val id: Int = globalID
 
@@ -26,7 +28,7 @@ fun allParents(node: Node): Set<Node> {
     }
     var parents = mutableSetOf<Node>(node)
     node.parents.forEach {
-	parents.plusAssign(allParents(it))
+	parents += allParents(it)
     }
     return parents
 }
@@ -59,13 +61,13 @@ class Lattice {
 	var charLevel: Int = starLevel-1
 	var level1Nodes = mutableSetOf<Node>()
 	for (rule in allAlphas) {
-	    level1Nodes.plusAssign(Node(rule, setOf(alphaStarNode), charLevel))
+	    level1Nodes += Node(rule, setOf(alphaStarNode), charLevel)
 	}
 	for (rule in allNums) {
-	    level1Nodes.plusAssign(Node(rule, setOf(numStarNode), charLevel))
+	    level1Nodes += Node(rule, setOf(numStarNode), charLevel)
 	}
 	for (rule in allPuncts) {
-	    level1Nodes.plusAssign(Node(rule, setOf(punctStarNode), charLevel))
+	    level1Nodes += Node(rule, setOf(punctStarNode), charLevel)
 	}
 
 	// Bottom level
@@ -76,8 +78,6 @@ class Lattice {
 	}
     }
 
-    // TODO: improve efficiency of meet! The current method is very very slow
-    // -aholmquist 2022-10-22
     fun meet(n1: Node, n2: Node): Node {
 	val alln1 = allParents(n1)
 	val alln2 = allParents(n2)
@@ -106,12 +106,23 @@ class Lattice {
 	var curNode = prevNode
 	var finalRegex = ""
 	while (tokenIdx < token.length) {
+	    println("New iteration.")
+	    println("finalRegex: $finalRegex")
+	    println("tokenIdx: $tokenIdx")
+	    println("prevRegexIdx: $prevRegexIdx")
+	    println("prevNode.rule: ${prevNode.rule}")
+	    println("curNode.rule: ${curNode.rule}")
+
 	    val c: String = token[tokenIdx].toString()
 	    val newNode = Node.allNodes.getValue(c)
 	    val lub: Node = meet(curNode, newNode)
 
+	    println("newNode.rule: ${newNode.rule}")
+	    println("lub.rule: ${lub.rule}")
+
 	    if (!lub.isTop()) {
 		if (!(lub.level > 1 && finalRegex.endsWith(lub.rule))) {
+		    println("Adding '${lub.rule}' to final regex")
 		    finalRegex += lub.rule
 		    curNode = lub
 		}
@@ -119,6 +130,8 @@ class Lattice {
 	    }
 
 	    if (lub.isTop()) {
+		println("Backtracking. finalRegex before: $finalRegex")
+
 		val finalNode = Node.allNodes.getValue(
 		    parseTokenSuffix(finalRegex, finalRegex.length))
 		if (meet(finalNode, curNode).isTop()) {
@@ -151,12 +164,17 @@ class Lattice {
 		prevRegexIdx = prevResult.right
 		tokenIdx = tokenResult.right
 
+		println("New prevRegexIdx: $prevRegexIdx")
+		println("New tokenIdx: $tokenIdx")
+
 		if (prevRegexIdx >= prevRegex.length) {
 		    break
 		}
 		prevNode = Node.allNodes.getValue(parseTokenPrefix(prevRegex,
 							     prevRegexIdx))
 		curNode = prevNode
+
+		println("finalRegex after backtracking: $finalRegex")
 
 	    } else if (prevNode.level == 1) {
 		prevRegexIdx += prevNode.rule.length
@@ -169,21 +187,30 @@ class Lattice {
 	    }
 	}
 
-	var leftover: String
-	leftover = addLeftover(prevRegex, prevRegexIdx)
-	if (leftover == top.rule) {
+	println("Final regex before adding leftover: $finalRegex")
+
+	// Add leftovers from previous regex and token, if there are any.
+	curNode = Node.allNodes.getValue(parseTokenSuffix(finalRegex,
+							  finalRegex.length))
+	val leftoverPrev = getLeftover(prevRegex, prevRegexIdx)
+	if (leftoverPrev.isTop()) {
 	    return top.rule
 	}
-	if (!finalRegex.endsWith(leftover)) {
-	    finalRegex += leftover
+	val lubPrev = meet(curNode, leftoverPrev)
+	if (lubPrev.rule != curNode.rule) {
+	    finalRegex += leftoverPrev.rule
 	}
-	leftover = addLeftover(token, tokenIdx)
-	if (leftover == top.rule) {
+	println("final first left over: ${curNode.rule}")
+	val leftoverToken = getLeftover(token, tokenIdx)
+	if (leftoverToken.isTop()) {
 	    return top.rule
 	}
-	if (!finalRegex.endsWith(leftover)) {
-	    finalRegex += leftover
+	val lubToken = meet(lubPrev, leftoverToken)
+	if (lubPrev.rule != lubToken.rule) {
+	    finalRegex += leftoverToken.rule
 	}
+
+	println("Final regex after adding leftovers: $finalRegex")
 
 	if (finalRegex == "") {
 	    return top.rule
@@ -198,6 +225,8 @@ class Lattice {
 			       val node: Node)
 
     fun backtrack(s: String, prevOffset: Int): BacktrackResult {
+	println("Backtracking $s with offset $prevOffset")
+
 	var curNode = Node.allNodes.getValue(parseTokenPrefix(s, prevOffset))
 	var offset: Int = prevOffset
 
@@ -235,13 +264,18 @@ class Lattice {
 	}
 	right = offset
 
+	println("Result of backtracking $s: ${curNode.rule}")
+
 	return BacktrackResult(curNode.rule, left, right, curNode)
     }
 
-    fun addLeftover(s: String, sidx: Int): String {
+    fun getLeftover(s: String, sidx: Int): Node {
+	println("Getting leftover for $s sidx: $sidx")
+
 	if (sidx >= s.length) {
 	    // No leftover
-	    return ""
+	    println("No leftover")
+	    return bottom
 	}
 
 	var idx = sidx
@@ -259,14 +293,19 @@ class Lattice {
 	    val newNode = Node.allNodes.getValue(newRegex)
 	    val lub: Node = meet(curNode, newNode)
 
+	    println("curNode.rule: ${curNode.rule}")
+	    println("newNode.rule: ${newNode.rule}")
+	    println("lub.rule: ${lub.rule}")
+
 	    if (lub.isTop()) {
 		// No match!
-		return top.rule
+		return top
 	    }
 	    curNode = lub
 	    idx += newNode.rule.length
 	}
 
-	return curNode.rule
+	println("Leftover: ${curNode.rule}")
+	return curNode
     }
 }

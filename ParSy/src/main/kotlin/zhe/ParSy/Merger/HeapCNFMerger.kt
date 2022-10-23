@@ -78,10 +78,12 @@ public class HeapCNFMerger : IMerger {
             val g1: ProductionRule = other.rules.getOrDefault(i, ProductionRule(i))
             val g2: ProductionRule = grammar.rules.getOrDefault(i, ProductionRule(i))
 
-            val newRuleSet: Set<Rule> = g1.rules.union(g2.rules)
-	    val compressedRuleSet = compressRuleSet(newRuleSet)
+            val allRules: Set<Rule> = g1.rules.union(g2.rules)
+	    val compressedRules = compressRuleSet(allRules)
 
-            newRules.put(i, ProductionRule(i, compressedRuleSet))
+	    println("Compressed rules: ${compressedRules}")
+
+            newRules.put(i, ProductionRule(i, compressedRules))
         }
 
         return HeapCNFGrammar(newRules)

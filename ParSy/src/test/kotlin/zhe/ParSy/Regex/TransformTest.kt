@@ -262,6 +262,15 @@ class TransformTest {
     	assertThat(actual).isEqualTo(expected)
     }
 
+    @Test
+    fun transformSingleNumAndMultipleAlpha() {
+	// Previously, this test case was resulting in \p{Alnum}*\p{Alpha} . It
+	// was a problem in the leftovers part.
+    	var actual = lattice.transform("#\\d*", "#\\d*")
+    	var expected = "#\\d*"
+    	assertThat(actual).isEqualTo(expected)
+    }
+
     // TODO: How to solve these cases :/ ? -aholmquist 2022-10-08
     // @Test
     // fun transformPunctWithAndWithoutAlphaAndDifferentAmountsOfPunct() {
