@@ -53,7 +53,7 @@ tasks {
 }
 
 application {
-    mainClassName = "zhe.ParSy.AppKt"
+    mainClassName = applicationMainClassName
 }
 
 dependencies {

@@ -11,6 +11,10 @@ import java.util.Stack
 public class TrivialSolver(): ISolver {
     override fun solve(tokens : Stack<String>): IGrammar {
         val grammarRules: MutableRulesMap = MutableRulesMap()
+	if (tokens.size == 0) {
+	    return HeapCNFGrammar(grammarRules)
+	}
+
         val rFactory: RuleFactory = RuleFactory(2 * tokens.size - 1)
 
         var connectionRule : ProductionRule? = null
