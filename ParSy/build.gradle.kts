@@ -15,6 +15,9 @@ plugins {
     // Apply the application plugin to add support for building a CLI
     // application.
     application
+
+    // This pluging allows greater flexibility in customizing test builds.
+    id("org.unbroken-dome.test-sets") version "4.0.0"
 }
 
 val fatJar = task("fatJar", type=Jar::class) {
@@ -55,11 +58,11 @@ application {
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.assertj:assertj-core:3.23.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnitPlatform() // JUnit5
 
     testLogging {
         lifecycle {

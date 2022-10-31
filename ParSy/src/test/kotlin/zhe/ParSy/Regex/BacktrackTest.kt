@@ -1,6 +1,6 @@
 package zhe.ParSy.Regex
 
-import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class BacktrackTest {
@@ -14,9 +14,9 @@ class BacktrackTest {
 	val actual = lattice.backtrack(token, tokenIdx)
 	val expected = Lattice.BacktrackResult("\\d*", 0, 3, lattice.top)
 
-	assertThat(actual.regex).isEqualTo(expected.regex)
-	assertThat(actual.left).isEqualTo(expected.left)
-	assertThat(actual.right).isEqualTo(expected.right)
+	assertEquals(expected.regex, actual.regex)
+	assertEquals(expected.left, actual.left)
+	assertEquals(expected.right, actual.right)
     }
 
     @Test
@@ -27,9 +27,9 @@ class BacktrackTest {
 	val actual = lattice.backtrack(token, tokenIdx)
 	val expected = Lattice.BacktrackResult("\\d*", 0, 3, lattice.top)
 
-	assertThat(actual.regex).isEqualTo(expected.regex)
-	assertThat(actual.left).isEqualTo(expected.left)
-	assertThat(actual.right).isEqualTo(expected.right)
+	assertEquals(expected.regex, actual.regex)
+	assertEquals(expected.left, actual.left)
+	assertEquals(expected.right, actual.right)
     }
 
 }

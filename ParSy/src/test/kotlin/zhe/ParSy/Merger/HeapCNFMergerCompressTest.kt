@@ -6,7 +6,7 @@ import zhe.ParSy.Regex.alphaStar
 import zhe.ParSy.Regex.numStar
 import zhe.ParSy.Regex.punctStar
 
-import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 public class HeapCNFMergerCompressTest {
@@ -21,7 +21,7 @@ public class HeapCNFMergerCompressTest {
 	)
 	val expected = inputRules
 	val actual = merger.compressRuleSet(inputRules)
-	assertThat(actual).isEqualTo(expected)
+	assertEquals(expected, actual)
     }
 
     @Test
@@ -34,7 +34,7 @@ public class HeapCNFMergerCompressTest {
 	)
 	val expected = inputRules
 	val actual = merger.compressRuleSet(inputRules)
-	assertThat(actual).isEqualTo(expected)
+	assertEquals(expected, actual)
     }
 
     @Test
@@ -48,7 +48,7 @@ public class HeapCNFMergerCompressTest {
 	    TerminalRule(alphaStar)
 	)
 	val actual = merger.compressRuleSet(inputRules)
-	assertThat(actual).isEqualTo(expected)
+	assertEquals(expected, actual)
     }
 
     @Test
@@ -64,7 +64,7 @@ public class HeapCNFMergerCompressTest {
 	    TerminalRule(alphaStar)
 	)
 	val actual = merger.compressRuleSet(inputRules)
-	assertThat(actual).isEqualTo(expected)
+	assertEquals(expected, actual)
     }
 
     @Test
@@ -79,7 +79,7 @@ public class HeapCNFMergerCompressTest {
 	    TerminalRule("$numStar.$numStar.$numStar.$numStar")
 	)
 	val actual = merger.compressRuleSet(inputRules)
-	assertThat(actual).isEqualTo(expected)
+	assertEquals(expected, actual)
     }
 
     @Test
@@ -97,7 +97,7 @@ public class HeapCNFMergerCompressTest {
 	    TerminalRule("$numStar.$numStar.$numStar.$numStar")
 	)
 	val actual = merger.compressRuleSet(inputRules)
-	assertThat(actual).isEqualTo(expected)
+	assertEquals(expected, actual)
     }
 
     @Test
@@ -117,7 +117,7 @@ public class HeapCNFMergerCompressTest {
 	    TerminalRule("Operation")
 	)
 	val actual = merger.compressRuleSet(inputRules)
-	assertThat(actual).isEqualTo(expected)
+	assertEquals(expected, actual)
     }
 
     @Test
@@ -140,6 +140,6 @@ public class HeapCNFMergerCompressTest {
 	    TerminalRule("$alphaStar$punctStar$alphaStar"),
 	)
 	val actual = merger.compressRuleSet(inputRules)
-	assertThat(actual).isEqualTo(expected)
+	assertEquals(expected, actual)
     }
 }
