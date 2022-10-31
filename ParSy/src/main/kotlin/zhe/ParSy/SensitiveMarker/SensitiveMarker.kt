@@ -6,23 +6,29 @@ import kotlin.text.Regex
 // TODO: move this to the appropriate package. This delimeter needs to be the
 // same across multiple packages. -aholmquist 2022-10-30
 val tokenDelimeter = " "
-val sensitiveRegex = Regex("<(\\p{Alnum}+)>(.+)</\\1>($tokenDelimeter)*")
+val sensitiveRegex = Regex("<(\\p{Alnum}+)>(.+)</\\1>")
 
 // TODO: wrap this in a class and refactor -aholmquist 2022-10-30
 
 fun findSensitiveWords(ln: String): Pair<List<Int>?, String> {
     println("In findSensitiveWords. Received line: ${ln}")
 
-    var matches = sensitiveRegex.findAll(ln)
+    // Remove cases where the delimeter is given in sequence.
+    val moreThanOneDelimeter = Regex("(${tokenDelimeter}){2,}")
+    val cleanLine = moreThanOneDelimeter.
+                        replace(ln, tokenDelimeter).
+			trim({ it.toString() == tokenDelimeter })
+
+    var matches = sensitiveRegex.findAll(cleanLine)
     if (matches.count() < 1) {
-	return Pair(null, ln)
+	return Pair(null, cleanLine)
     }
 
     // Keep a map of <token starting position> -> <token index in given line>
     var tokenPositionToIndex = mutableMapOf<Int, Int>()
     var tokenPositionToIndexPointer = 0
     var indexInLine = 0
-    val splitLine = ln.split(tokenDelimeter)
+    val splitLine = cleanLine.split(tokenDelimeter)
     splitLine.forEach { token ->
         if (token == "") {
 	    return@forEach
@@ -32,29 +38,30 @@ fun findSensitiveWords(ln: String): Pair<List<Int>?, String> {
         tokenPositionToIndexPointer += token.length + tokenDelimeter.length
     }
     val lastWordIndex = indexInLine - 1
+    println("Token position to index map: ${tokenPositionToIndex}")
 
     var matchIndexes = mutableListOf<Int>()
     var nonMarkedLine = ""
     var nonMarkedLineIdx = 0
     matches.iterator().forEach { match ->
         val start = match.range.start
-	val end = match.range.endInclusive + 1
+	val end = match.range.endInclusive + tokenDelimeter.length
 
 	// Add the index of each token in the matched sensitive string
 	var matchedWordIndexInLine = tokenPositionToIndex.getValue(start)
-	println("Matched word index in line: ${matchedWordIndexInLine}")
 	var rlimWordIndexInLine = 0
-	if (end+tokenDelimeter.length >= ln.length) {
+	if (end + tokenDelimeter.length >= cleanLine.length) {
 	    rlimWordIndexInLine =
 		lastWordIndex + tokenDelimeter.length
 	} else {
 	    rlimWordIndexInLine =
-		tokenPositionToIndex.getValue(end+tokenDelimeter.length)
+		tokenPositionToIndex.getValue(end + tokenDelimeter.length)
 	}
 	while (matchedWordIndexInLine < rlimWordIndexInLine) {
             matchIndexes += matchedWordIndexInLine
 	    matchedWordIndexInLine++
 	}
+	println("Matched word index in line: ${matchedWordIndexInLine}")
 
 	// TODO: try to refactor this -aholmquist 2022-10-30
 	//
@@ -62,7 +69,7 @@ fun findSensitiveWords(ln: String): Pair<List<Int>?, String> {
 	// (non-marked) input can be easily processed downstream.
 	//
 	// Before
-	nonMarkedLine += ln.substring(nonMarkedLineIdx, start)
+	nonMarkedLine += cleanLine.substring(nonMarkedLineIdx, start)
 	// Middle
 	val (_, middleValue) = match.destructured
 	nonMarkedLine += middleValue
@@ -76,8 +83,8 @@ fun findSensitiveWords(ln: String): Pair<List<Int>?, String> {
 	println("Non marked line: ${nonMarkedLine}")
     }
     // Add rest of the line
-    if (nonMarkedLineIdx < ln.length) {
-	nonMarkedLine += ln.substring(nonMarkedLineIdx)
+    if (nonMarkedLineIdx < cleanLine.length) {
+	nonMarkedLine += cleanLine.substring(nonMarkedLineIdx)
     }
 
     return Pair(matchIndexes, nonMarkedLine)
