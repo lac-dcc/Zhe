@@ -3,7 +3,8 @@ package zhe.ParSy.Grammar
 import zhe.ParSy.Grammar.RulesMap
 
 sealed class Rule() {
-    class TerminalRule(var pattern:String?) : Rule() {
+    class TerminalRule(var pattern: String?, val isSensitive: Boolean) : Rule() {
+	constructor(pattern: String?): this(pattern, false)
 
         override fun toString() : String {
             return "$pattern"
@@ -16,7 +17,12 @@ sealed class Rule() {
         }
     }
 
-    class ABRule(private var lRuleId: Int, private var rRuleId: Int) : Rule() {
+    class ABRule(
+	private val lRuleId: Int,
+	private val rRuleId: Int,
+	val isLeftSensitive: Boolean,
+	val isRightSensitive: Boolean
+    ) : Rule() {
 
         fun lRule(table: RulesMap) : Rule {
             return table[this.lRuleId]!!
@@ -27,7 +33,9 @@ sealed class Rule() {
         }
 
         override fun toString() : String {
-            return "R${lRuleId} R${rRuleId}"
+	    val leftPrefix = if (!isLeftSensitive) "R" else "S"
+	    val rightPrefix = if (!isRightSensitive) "R" else "S"
+            return "${leftPrefix}${lRuleId} ${rightPrefix}${rRuleId}"
         }
 
         override fun equals(other:Any?) : Boolean {
@@ -38,16 +46,26 @@ sealed class Rule() {
         }
     }
 
-    class ProductionRule(val id: Int, val rules:Set<Rule>) : Rule() {
+    class ProductionRule(
+	val id: Int,
+	val rules: Set<Rule>,
+	val isSensitive: Boolean
+    ) : Rule() {
 
-        constructor(rid: Int): this(rid, setOf<Rule>())
+        constructor(rid: Int): this(rid, setOf<Rule>(), false)
 
-        constructor(rid: Int, abRule: ABRule): this(rid, setOf<Rule>(abRule))
+        constructor(rid: Int, abRule: ABRule): this(
+	    rid, setOf<Rule>(abRule),
+	    abRule.isLeftSensitive && abRule.isRightSensitive)
 
-        constructor(rid: Int, tRule: TerminalRule): this(rid, setOf<Rule>(tRule)) 
+        constructor(rid: Int, tRule: TerminalRule): this(rid, setOf<Rule>(tRule), tRule.isSensitive)
+
+        constructor(rid: Int, tRule: TerminalRule, isSensitive: Boolean):
+	    this(rid, setOf<Rule>(tRule), isSensitive) 
 
         override fun toString() : String {
-            var output: String = "R${this.id} :: "
+	    val prefix = if (!isSensitive) "R" else "S"
+            var output: String = "${prefix}${this.id} :: "
             this.rules.forEachIndexed({index: Int, rule: Rule ->
                 if(index > 0)
                     output += " | "
@@ -66,7 +84,6 @@ sealed class Rule() {
                 && this.rules.union(nOther.rules).size == this.rules.size
         }
     }
-
 
     override abstract fun toString() : String
     override abstract fun equals(other:Any?) : Boolean

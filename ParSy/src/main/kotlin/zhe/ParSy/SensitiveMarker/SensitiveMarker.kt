@@ -7,6 +7,7 @@ class SensitiveMarker(val tokenDelimeter: String) {
 
     private val sensitiveRegex = Regex("<(\\p{Alnum}+)>(.+)</\\1>")
 
+    // TODO: Change name of this function to findSensitiveTokens -aholmquist 2022-10-31
     fun findSensitiveWords(ln: String): Pair<List<Int>?, String> {
 	println("In findSensitiveWords. Received line: ${ln}")
 
@@ -47,7 +48,7 @@ class SensitiveMarker(val tokenDelimeter: String) {
 
 	    // Add the index of each token in the matched sensitive string
 	    var matchedWordIndexInLine = tokenPositionToIndex.getValue(start)
-	    var rlimWordIndexInLine = 0
+	    var rlimWordIndexInLine: Int
 	    if (end + tokenDelimeter.length >= cleanLine.length) {
 		rlimWordIndexInLine =
 		    lastWordIndex + tokenDelimeter.length

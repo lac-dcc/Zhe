@@ -52,13 +52,13 @@ public class HeapCNFMerger : IMerger {
                 val resultRuleRegex = regexLattice.transform(prevRegex, curRegex)
 		if (resultRuleRegex == regexLattice.top.rule) {
 		    println("Went to top!")
-		    newCompressedRules.plusAssign(TerminalRule(prevRegex))
+		    newCompressedRules.plusAssign(TerminalRule(prevRegex, false))
 		    return@forEach
 		} else {
 		    curRegex = resultRuleRegex
 		}
 	    }
-	    newCompressedRules.plusAssign(TerminalRule(curRegex))
+	    newCompressedRules.plusAssign(TerminalRule(curRegex, false))
 
 	    compressedRules = newCompressedRules
 	}
@@ -83,7 +83,8 @@ public class HeapCNFMerger : IMerger {
 
 	    println("Compressed rules: ${compressedRules}")
 
-            newRules.put(i, ProductionRule(i, compressedRules))
+            newRules.put(i, ProductionRule(i, compressedRules,
+					   g1.isSensitive && g2.isSensitive))
         }
 
         return HeapCNFGrammar(newRules)
