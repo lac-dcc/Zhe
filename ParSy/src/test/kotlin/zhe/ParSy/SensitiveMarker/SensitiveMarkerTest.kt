@@ -4,10 +4,14 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class SensitiveMarkerTest {
+    companion object {
+	val marker = SensitiveMarker(" ")
+    }
+
     @Test
     fun findSensitiveWordsEmptyLine() {
 	val line = ""
-	val actual = findSensitiveWords(line)
+	val actual = marker.findSensitiveWords(line)
 	val expected = Pair(null, "")
 	assertEquals(expected, actual)
     }
@@ -15,7 +19,7 @@ class SensitiveMarkerTest {
     @Test
     fun findSensitiveWordsWithoutMarkdown() {
     	val line = "Shaken, not stirred"
-    	val actual = findSensitiveWords(line)
+    	val actual = marker.findSensitiveWords(line)
     	val expected = Pair(null, "Shaken, not stirred")
     	assertEquals(expected, actual)
     }
@@ -23,7 +27,7 @@ class SensitiveMarkerTest {
     @Test
     fun findSensitiveWordsOneMarkedMiddle() {
     	val line = "My name is <s>Bond,</s> James Bond"
-    	val actual = findSensitiveWords(line)
+    	val actual = marker.findSensitiveWords(line)
     	val expected = Pair(
     	    listOf(3),
     	    "My name is Bond, James Bond"
@@ -34,7 +38,7 @@ class SensitiveMarkerTest {
     @Test
     fun findSensitiveWordsOneMarkedEnd() {
     	val line = "My name is Bond, James <s>Bond</s>"
-    	val actual = findSensitiveWords(line)
+    	val actual = marker.findSensitiveWords(line)
     	val expected = Pair(
     	    listOf(5),
     	    "My name is Bond, James Bond"
@@ -45,7 +49,7 @@ class SensitiveMarkerTest {
     @Test
     fun findSensitiveWordsTwoMarkedMiddle() {
     	val line = "My name is <s>Bond, James</s> Bond"
-    	val actual = findSensitiveWords(line)
+    	val actual = marker.findSensitiveWords(line)
     	val expected = Pair(
     	    listOf(3, 4),
     	    "My name is Bond, James Bond"
@@ -56,7 +60,7 @@ class SensitiveMarkerTest {
     @Test
     fun findSensitiveWordsTwoMarkedEnd() {
     	val line = "My name is Bond, <s>James Bond</s>"
-    	val actual = findSensitiveWords(line)
+    	val actual = marker.findSensitiveWords(line)
     	val expected = Pair(
     	    listOf(4, 5),
     	    "My name is Bond, James Bond"
@@ -67,7 +71,7 @@ class SensitiveMarkerTest {
     @Test
     fun findSensitiveWordsThreeMarkedEnd() {
     	val line = "My name is <s>Bond, James Bond</s>"
-    	val actual = findSensitiveWords(line)
+    	val actual = marker.findSensitiveWords(line)
     	val expected = Pair(
     	    listOf(3, 4, 5),
     	    "My name is Bond, James Bond"
@@ -78,7 +82,7 @@ class SensitiveMarkerTest {
     @Test
     fun findSensitiveWordsThreeMarkedEndWithTrailingSpace() {
     	val line = "    My name is <s>Bond, James Bond</s>      "
-    	val actual = findSensitiveWords(line)
+    	val actual = marker.findSensitiveWords(line)
     	val expected = Pair(
     	    listOf(3, 4, 5),
     	    "My name is Bond, James Bond"
@@ -89,7 +93,18 @@ class SensitiveMarkerTest {
     @Test
     fun findSensitiveWordsLotsOfSpaces() {
     	val line = "    My     name     is   <s>Bond,    James    Bond</s>     "
-    	val actual = findSensitiveWords(line)
+    	val actual = marker.findSensitiveWords(line)
+    	val expected = Pair(
+    	    listOf(3, 4, 5),
+    	    "My name is Bond, James Bond"
+    	)
+    	assertEquals(expected, actual)
+    }
+
+    @Test
+    fun findSensitiveWordsMarkedWithDifferentTag() {
+    	val line = "My name is <sensitive>Bond, James Bond</sensitive>"
+    	val actual = marker.findSensitiveWords(line)
     	val expected = Pair(
     	    listOf(3, 4, 5),
     	    "My name is Bond, James Bond"
