@@ -7,9 +7,8 @@ class SensitiveMarker(val tokenDelimeter: String) {
 
     private val sensitiveRegex = Regex("<(\\p{Alnum}+)>(.+)</\\1>")
 
-    // TODO: Change name of this function to findSensitiveTokens -aholmquist 2022-10-31
-    fun findSensitiveWords(ln: String): Pair<List<Int>?, String> {
-	println("In findSensitiveWords. Received line: ${ln}")
+    fun findSensitiveTokens(ln: String): Pair<List<Int>?, String> {
+	println("In findSensitiveTokens. Received line: ${ln}")
 
 	// Remove cases where the delimeter is given in sequence.
 	val moreThanOneDelimeter = Regex("(${tokenDelimeter}){2,}")

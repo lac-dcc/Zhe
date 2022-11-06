@@ -39,9 +39,10 @@ fun main(args:Array<String>){
         numLines++
 
         val (sensitiveTokenIndexesList, cleanLine) =
-	    sensitiveMarker.findSensitiveWords(line)
+	    sensitiveMarker.findSensitiveTokens(line)
 
-	val sensitiveTokenIndexes = sensitiveTokenIndexesList?.toSet() ?: setOf<Int>()
+	val sensitiveTokenIndexes = sensitiveTokenIndexesList?.toSet() ?:
+	                            setOf<Int>()
 
 	tokens = cleanLine.split(tokenDelimeter)
 	val g2 = solver.solve(tokens, sensitiveTokenIndexes)
