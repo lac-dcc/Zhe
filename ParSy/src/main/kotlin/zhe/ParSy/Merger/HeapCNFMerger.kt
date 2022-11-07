@@ -13,6 +13,7 @@ import kotlin.math.max
 public class HeapCNFMerger : IMerger {
 
     companion object {
+	// regexLattice is used to compress rules.
 	private val regexLattice = Lattice()
     }
 
@@ -46,19 +47,20 @@ public class HeapCNFMerger : IMerger {
 
 	    var newCompressedRules = mutableSetOf<TerminalRule>()
 	    var curRegex = rule.toString()
-	    compressedRules.forEach { prevRule -> 
-		println("In new iteration in inner forEach. Previous rule: ${prevRule.toString()}")
+	    compressedRules.forEach { prevRule ->
+		println("In new iteration in inner forEach. "+
+			"Previous rule: ${prevRule.toString()}")
 		prevRegex = prevRule.toString()
                 val resultRuleRegex = regexLattice.transform(prevRegex, curRegex)
 		if (resultRuleRegex == regexLattice.top.rule) {
 		    println("Went to top!")
-		    newCompressedRules.plusAssign(TerminalRule(prevRegex))
+		    newCompressedRules.plusAssign(prevRule)
 		    return@forEach
 		} else {
 		    curRegex = resultRuleRegex
 		}
 	    }
-	    newCompressedRules.plusAssign(TerminalRule(curRegex))
+	    newCompressedRules.plusAssign(TerminalRule(curRegex, rule.isSensitive))
 
 	    compressedRules = newCompressedRules
 	}
@@ -79,8 +81,9 @@ public class HeapCNFMerger : IMerger {
             val g2: ProductionRule = grammar.rules.getOrDefault(i, ProductionRule(i))
 
             val allRules: Set<Rule> = g1.rules.union(g2.rules)
-	    val compressedRules = compressRuleSet(allRules)
+	    println("Rules before compression: ${allRules}")
 
+	    val compressedRules = compressRuleSet(allRules)
 	    println("Compressed rules: ${compressedRules}")
 
             newRules.put(i, ProductionRule(i, compressedRules,

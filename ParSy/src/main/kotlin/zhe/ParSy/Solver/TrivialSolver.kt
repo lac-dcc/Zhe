@@ -1,5 +1,6 @@
 package zhe.ParSy.Solver
 
+import zhe.ParSy.Grammar.Rule.ABRule
 import zhe.ParSy.Grammar.Rule.ProductionRule
 import zhe.ParSy.Factory.RuleFactory
 import zhe.ParSy.Grammar.IGrammar
@@ -11,42 +12,49 @@ public class TrivialSolver(): ISolver {
 	tokens : List<String>,
 	sensitiveTokenIndexes: Set<Int>
     ): IGrammar {
-        val grammarRules: MutableRulesMap = MutableRulesMap()
+        val grammarRules = MutableRulesMap()
 	if (tokens.size == 0) {
 	    return HeapCNFGrammar(grammarRules)
 	}
 
-        val rFactory: RuleFactory = RuleFactory(2 * tokens.size - 1)
+	val tokenStack = TokenStack(tokens, sensitiveTokenIndexes)
+        val rFactory = RuleFactory(HeapCNFGrammar.maxSize(tokens.size))
+	var connectionRule = addInitialRules(tokenStack, grammarRules, rFactory)
 
-        var connectionRule : ProductionRule? = null
-
-	var i = tokens.size - 1
-	val isRule1Sensitive = sensitiveTokenIndexes.contains(i)
-        var rule1: ProductionRule = rFactory.getTerminalRule(tokens[i],
-							     isRule1Sensitive)
-	i--
-        grammarRules.put(rule1.id, rule1)
-
-        while (i >= 0) {
-	    val token = tokens[i]
-	    val isSensitiveToken = sensitiveTokenIndexes.contains(i)
-            if (connectionRule == null) {
-                val rule2  = rFactory.getTerminalRule(token, isSensitiveToken)
-                grammarRules.put(rule2.id, rule2)
-
-                connectionRule = rFactory.getABRule(
-		    rule1.id, rule2.id, isRule1Sensitive, isSensitiveToken)
-            } else {
-                rule1 = rFactory.getTerminalRule(token, isSensitiveToken)
-                grammarRules.put(rule1.id, rule1)
-
-                connectionRule = rFactory.getABRule(
-		    rule1.id, connectionRule.id, isRule1Sensitive, isSensitiveToken)
-            }
+        while (!tokenStack.isEmpty()) {
+	    val newTerminalRule = addTerminalRule(tokenStack, grammarRules, rFactory)
+	    connectionRule = rFactory.getABRule(newTerminalRule, connectionRule)
             grammarRules.put(connectionRule.id, connectionRule)
-	    i--
         }
 
         return HeapCNFGrammar(grammarRules)
+    }
+
+    fun addInitialRules(
+	tokenStack: TokenStack,
+	grammarRules: MutableRulesMap,
+	rFactory: RuleFactory,
+    ): ProductionRule {
+	val terminalRule1 = addTerminalRule(tokenStack, grammarRules, rFactory)
+	if (tokenStack.isEmpty()) {
+	    return terminalRule1
+	}
+	val terminalRule2 = addTerminalRule(tokenStack, grammarRules, rFactory)
+	// Notice we use the order 'terminalRule2 terminalRule1'. This is
+	// because we are going backwards (LIFO) order.
+	val connectionRule = rFactory.getABRule(terminalRule2, terminalRule1)
+	grammarRules.put(connectionRule.id, connectionRule)
+	return connectionRule
+    }
+
+    fun addTerminalRule(
+	tokenStack: TokenStack,
+	grammarRules: MutableRulesMap,
+	rFactory: RuleFactory,
+    ): ProductionRule {
+	val (token, isSensitive) = tokenStack.pop()
+	val terminalRule = rFactory.getTerminalRule(token, isSensitive)
+	grammarRules.put(terminalRule.id, terminalRule)
+	return terminalRule
     }
 }

@@ -24,6 +24,8 @@ sealed class Rule() {
 	val isRightSensitive: Boolean
     ) : Rule() {
 
+	constructor(lRuleId: Int, rRuleId: Int): this(lRuleId, rRuleId, false, false)
+
         fun lRule(table: RulesMap) : Rule {
             return table[this.lRuleId]!!
         }

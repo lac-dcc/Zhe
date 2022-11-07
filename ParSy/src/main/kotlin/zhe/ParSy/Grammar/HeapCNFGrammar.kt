@@ -18,4 +18,10 @@ public class HeapCNFGrammar : IGrammar{
         }
         return output
     }
+
+    companion object {
+	fun maxSize(numTokens: Int): Int {
+	    return 2 * numTokens - 1
+	}
+    }
 }
