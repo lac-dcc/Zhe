@@ -3,28 +3,31 @@ package zhe.ParSy.Grammar
 import zhe.ParSy.Grammar.RulesMap
 
 sealed class Rule() {
-    class TerminalRule(var pattern: String?, val isSensitive: Boolean) : Rule() {
-	constructor(pattern: String?): this(pattern, false)
+
+    // Only terminal rules can be sensitive. That is because if we were to
+    // consider an entire rule to be sensitive, then every token that appeared
+    // in that position in the example text given by the user would also become
+    // sensitive.
+    class TerminalRule(var pattern: String, val isSensitive: Boolean) : Rule() {
+	constructor(pattern: String): this(pattern, false)
 
         override fun toString() : String {
-            return "$pattern"
+	    if (isSensitive) {
+		return "<S>$pattern"
+	    } else {
+		return "<N>$pattern"
+	    }
         }
 
         override fun equals(other:Any?) : Boolean {
             if(other !is TerminalRule) 
                 return false
             return other.pattern == this.pattern
+	           && other.isSensitive == this.isSensitive
         }
     }
 
-    class ABRule(
-	private val lRuleId: Int,
-	private val rRuleId: Int,
-	val isLeftSensitive: Boolean,
-	val isRightSensitive: Boolean
-    ) : Rule() {
-
-	constructor(lRuleId: Int, rRuleId: Int): this(lRuleId, rRuleId, false, false)
+    class ABRule(private val lRuleId: Int, private val rRuleId: Int) : Rule() {
 
         fun lRule(table: RulesMap) : Rule {
             return table[this.lRuleId]!!
@@ -35,9 +38,7 @@ sealed class Rule() {
         }
 
         override fun toString() : String {
-	    val leftPrefix = if (!isLeftSensitive) "R" else "S"
-	    val rightPrefix = if (!isRightSensitive) "R" else "S"
-            return "${leftPrefix}${lRuleId} ${rightPrefix}${rRuleId}"
+            return "R${lRuleId} R${rRuleId}"
         }
 
         override fun equals(other:Any?) : Boolean {
@@ -48,26 +49,16 @@ sealed class Rule() {
         }
     }
 
-    class ProductionRule(
-	val id: Int,
-	val rules: Set<Rule>,
-	val isSensitive: Boolean
-    ) : Rule() {
+    class ProductionRule(val id: Int, val rules: Set<Rule>) : Rule() {
 
-        constructor(rid: Int): this(rid, setOf<Rule>(), false)
+        constructor(rid: Int): this(rid, setOf<Rule>())
 
-        constructor(rid: Int, abRule: ABRule): this(
-	    rid, setOf<Rule>(abRule),
-	    abRule.isLeftSensitive && abRule.isRightSensitive)
+        constructor(rid: Int, abRule: ABRule): this(rid, setOf<Rule>(abRule))
 
-        constructor(rid: Int, tRule: TerminalRule): this(rid, setOf<Rule>(tRule), tRule.isSensitive)
-
-        constructor(rid: Int, tRule: TerminalRule, isSensitive: Boolean):
-	    this(rid, setOf<Rule>(tRule), isSensitive) 
+        constructor(rid: Int, tRule: TerminalRule): this(rid, setOf<Rule>(tRule))
 
         override fun toString() : String {
-	    val prefix = if (!isSensitive) "R" else "S"
-            var output: String = "${prefix}${this.id} :: "
+            var output: String = "R${this.id} :: "
             this.rules.forEachIndexed({index: Int, rule: Rule ->
                 if(index > 0)
                     output += " | "

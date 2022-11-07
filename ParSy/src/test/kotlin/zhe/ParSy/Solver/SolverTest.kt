@@ -42,10 +42,10 @@ public class SolverTest {
     fun solveNoSensitive() {
 	val tokens = "I am Bond".split(" ")
 	val sensitiveTokenIndexes = setOf<Int>()
-	val expectedGrammarString = """R4 :: Bond
-R3 :: am
+	val expectedGrammarString = """R4 :: <N>Bond
+R3 :: <N>am
 R2 :: R3 R4
-R1 :: I
+R1 :: <N>I
 R0 :: R1 R2
 """
 	val actualGrammar = solver.solve(tokens, sensitiveTokenIndexes)
@@ -53,18 +53,18 @@ R0 :: R1 R2
 	assertEquals(expectedGrammarString, actualGrammarString)
     }
 
-//     @Test
-//     fun solveSensitive() {
-// 	val tokens = "I am Bond".split(" ")
-// 	val sensitiveTokenIndexes = setOf<Int>(2)
-// 	val expectedGrammarString = """R4 :: <S>Bond
-// R3 :: <N>am
-// R2 :: R3 R4
-// R1 :: <N>I
-// R0 :: R1 R2
-// """
-// 	val actualGrammar = solver.solve(tokens, sensitiveTokenIndexes)
-// 	val actualGrammarString = actualGrammar.toString()
-// 	assertEquals(expectedGrammarString, actualGrammarString)
-//     }
+    @Test
+    fun solveSensitive() {
+	val tokens = "I am Bond".split(" ")
+	val sensitiveTokenIndexes = setOf<Int>(2)
+	val expectedGrammarString = """R4 :: <S>Bond
+R3 :: <N>am
+R2 :: R3 R4
+R1 :: <N>I
+R0 :: R1 R2
+"""
+	val actualGrammar = solver.solve(tokens, sensitiveTokenIndexes)
+	val actualGrammarString = actualGrammar.toString()
+	assertEquals(expectedGrammarString, actualGrammarString)
+    }
 }

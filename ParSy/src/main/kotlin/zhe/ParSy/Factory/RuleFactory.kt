@@ -18,26 +18,15 @@ class RuleFactory(val maxRules: Int) {
 
     fun getTerminalRule(tkn: String, isSensitive: Boolean) : ProductionRule { 
         val rid = this.getNextId()
-        return ProductionRule(rid, TerminalRule(tkn, isSensitive), isSensitive)
+        return ProductionRule(rid, TerminalRule(tkn, isSensitive))
     }
 
-    fun getABRule(
-	lRule: Int,
-	rRule: Int,
-	isLeftSensitive: Boolean,
-	isRightSensitive: Boolean,
-    ) : ProductionRule {
+    fun getABRule(lRule: Int, rRule: Int) : ProductionRule {
         val rid: Int = this.getNextId()
-        return ProductionRule(rid, ABRule(lRule, rRule, isLeftSensitive,
-					  isRightSensitive))
+        return ProductionRule(rid, ABRule(lRule, rRule))
     }
 
     fun getABRule(lRule: ProductionRule, rRule: ProductionRule): ProductionRule {
-	return getABRule(
-	    lRule.id,
-	    rRule.id,
-	    lRule.isSensitive,
-	    rRule.isSensitive,
-	)
+	return getABRule(lRule.id, rRule.id)
     }
 }

@@ -9,9 +9,15 @@ import org.junit.jupiter.api.Test
 
 public class RuleTest {
     @Test
-    fun terminalRuleToString() {
+    fun terminalRuleNotSensitiveToString() {
 	val rule = TerminalRule("abc")
-	assertEquals("abc", rule.toString())
+	assertEquals("<N>abc", rule.toString())
+    }
+
+    @Test
+    fun terminalRuleSensitiveToString() {
+	val rule = TerminalRule("abc", true)
+	assertEquals("<S>abc", rule.toString())
     }
 
     @Test
@@ -21,21 +27,9 @@ public class RuleTest {
     }
 
     @Test
-    fun abRuleSensitiveToString() {
-	val rule = ABRule(1, 2, true, false)
-	assertEquals("S1 R2", rule.toString())
-    }
-
-    @Test
     fun simpleProductionRuleToString() {
 	val rule = ProductionRule(0, TerminalRule("abc"))
-	assertEquals("R0 :: abc", rule.toString())
-    }
-
-    @Test
-    fun simpleProductionRuleSensitiveToString() {
-	val rule = ProductionRule(0, TerminalRule("abc"), true)
-	assertEquals("S0 :: abc", rule.toString())
+	assertEquals("R0 :: <N>abc", rule.toString())
     }
 
     @Test
@@ -45,18 +39,7 @@ public class RuleTest {
 	    TerminalRule("abc"),
 	    TerminalRule("cba"),
 	)
-	val rule = ProductionRule(0, childRules, false)
-	assertEquals("R0 :: R1 R2 | abc | cba", rule.toString())
-    }
-
-    @Test
-    fun composedProductionRuleAllSensitiveToString() {
-	val childRules = setOf<Rule>(
-	    ABRule(1, 2, true, true),
-	    TerminalRule("abc", true),
-	    TerminalRule("cba", true),
-	)
-	val rule = ProductionRule(0, childRules, true)
-	assertEquals("S0 :: S1 S2 | abc | cba", rule.toString())
+	val rule = ProductionRule(0, childRules)
+	assertEquals("R0 :: R1 R2 | <N>abc | <N>cba", rule.toString())
     }
 }

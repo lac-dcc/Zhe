@@ -46,11 +46,11 @@ public class HeapCNFMerger : IMerger {
 	    }
 
 	    var newCompressedRules = mutableSetOf<TerminalRule>()
-	    var curRegex = rule.toString()
+	    var curRegex = rule.pattern
 	    compressedRules.forEach { prevRule ->
 		println("In new iteration in inner forEach. "+
-			"Previous rule: ${prevRule.toString()}")
-		prevRegex = prevRule.toString()
+			"Previous rule: ${prevRule.pattern}")
+		prevRegex = prevRule.pattern
                 val resultRuleRegex = regexLattice.transform(prevRegex, curRegex)
 		if (resultRuleRegex == regexLattice.top.rule) {
 		    println("Went to top!")
@@ -86,8 +86,7 @@ public class HeapCNFMerger : IMerger {
 	    val compressedRules = compressRuleSet(allRules)
 	    println("Compressed rules: ${compressedRules}")
 
-            newRules.put(i, ProductionRule(i, compressedRules,
-					   g1.isSensitive && g2.isSensitive))
+            newRules.put(i, ProductionRule(i, compressedRules))
         }
 
         return HeapCNFGrammar(newRules)
