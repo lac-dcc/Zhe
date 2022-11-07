@@ -9,7 +9,7 @@ import zhe.ParSy.Grammar.MutableRulesMap
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-public class SolverTest {
+public class TrivialSolverTest {
     companion object {
 	private val solver = TrivialSolver()
     }
@@ -42,11 +42,11 @@ public class SolverTest {
     fun solveNoSensitive() {
 	val tokens = "I am Bond".split(" ")
 	val sensitiveTokenIndexes = setOf<Int>()
-	val expectedGrammarString = """R4 :: <N>Bond
-R3 :: <N>am
-R2 :: R3 R4
+	val expectedGrammarString = """R0 :: R1 R2
 R1 :: <N>I
-R0 :: R1 R2
+R2 :: R3 R4
+R3 :: <N>am
+R4 :: <N>Bond
 """
 	val actualGrammar = solver.solve(tokens, sensitiveTokenIndexes)
 	val actualGrammarString = actualGrammar.toString()
@@ -57,11 +57,11 @@ R0 :: R1 R2
     fun solveSensitive() {
 	val tokens = "I am Bond".split(" ")
 	val sensitiveTokenIndexes = setOf<Int>(2)
-	val expectedGrammarString = """R4 :: <S>Bond
-R3 :: <N>am
-R2 :: R3 R4
+	val expectedGrammarString = """R0 :: R1 R2
 R1 :: <N>I
-R0 :: R1 R2
+R2 :: R3 R4
+R3 :: <N>am
+R4 :: <S>Bond
 """
 	val actualGrammar = solver.solve(tokens, sensitiveTokenIndexes)
 	val actualGrammarString = actualGrammar.toString()

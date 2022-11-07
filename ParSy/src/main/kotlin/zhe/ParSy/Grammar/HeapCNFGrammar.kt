@@ -13,7 +13,9 @@ public class HeapCNFGrammar : IGrammar{
 
     override fun toString() : String {
         var output: String = ""
-        rules.forEach { _, rule ->
+	// Sort first for consistency when printing map.
+	val sortedRules = rules.toSortedMap()
+        sortedRules.forEach { _, rule ->
                 output += rule.toString() + "\n"
         }
         return output
