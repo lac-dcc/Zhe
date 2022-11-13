@@ -6,15 +6,15 @@ import zhe.ParSy.Grammar.Rule.TerminalRule
 import zhe.ParSy.Grammar.HeapCNFGrammar
 import zhe.ParSy.Grammar.IGrammar
 import zhe.ParSy.Grammar.Rule
-import zhe.ParSy.Regex.Lattice
+import zhe.ParSy.Regex.Compressor
 
 import kotlin.math.max
 
 public class HeapCNFMerger : IMerger {
 
     companion object {
-	// regexLattice is used to compress rules.
-	private val regexLattice = Lattice()
+	// The compressor is used to compress grammar rules.
+	private val compressor = Compressor.newBasic()
     }
 
     // compressRuleSet takes a set of rules as an input, and returns the
@@ -51,13 +51,13 @@ public class HeapCNFMerger : IMerger {
 		println("In new iteration in inner forEach. "+
 			"Previous rule: ${prevRule.pattern}")
 		prevRegex = prevRule.pattern
-                val resultRuleRegex = regexLattice.transform(prevRegex, curRegex)
-		if (resultRuleRegex == regexLattice.top.rule) {
+                val compressResult = compressor.compress(prevRegex, curRegex)
+		if (compressResult.isTop) {
 		    println("Went to top!")
 		    newCompressedRules.plusAssign(prevRule)
 		    return@forEach
 		} else {
-		    curRegex = resultRuleRegex
+		    curRegex = compressResult.rule
 		}
 	    }
 	    newCompressedRules.plusAssign(TerminalRule(curRegex, rule.isSensitive))
