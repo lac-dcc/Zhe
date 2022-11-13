@@ -2,76 +2,46 @@ package zhe.ParSy.Regex
 
 import kotlin.math.min
 
-class Rule(val pattern: String) {}
-
-class Node(val rule: String, val parents: Set<Node>, val level: Int) {
-    private val id: Int = globalID
-
-    companion object {
-	var globalID: Int = 0
-	var allNodes = mutableMapOf<String, Node>()
-    }
-
-    init {
-	globalID++
-	allNodes[rule] = this
-    }
-
-    fun isTop(): Boolean {
-	return this.id == 0
-    }
-}
-
-fun allParents(node: Node): Set<Node> {
-    if (node.isTop()) {
-	return setOf(node)
-    }
-    var parents = mutableSetOf<Node>(node)
-    node.parents.forEach {
-	parents += allParents(it)
-    }
-    return parents
-}
-
 class Lattice {
     public var top: Node
     public var bottom: Node
 
     private var level1Map = mutableMapOf<String, Node>()
+    private val nf: NodeFactory
 
     constructor() {
-	Node.globalID = 0
+	nf = NodeFactory()
 
 	// Top level
 	val topLevel = 4
-	top = Node(".*", setOf<Node>(), 4)
+	top = nf.build(".*", setOf<Node>(), 4)
 	val setTop = setOf(top)
 
 	// Level 3
 	val alnumLevel: Int = topLevel-1
-	val alnumStarNode = Node(alnumStar, setTop, alnumLevel)
+	val alnumStarNode = nf.build(alnumStar, setTop, alnumLevel)
 
 	// Level 2
 	val starLevel: Int = alnumLevel-1
-	val alphaStarNode = Node(alphaStar, setOf(alnumStarNode), starLevel)
-	val numStarNode = Node(numStar, setOf(alnumStarNode), starLevel)
-	val punctStarNode = Node(punctStar, setTop, starLevel)
+	val alphaStarNode = nf.build(alphaStar, setOf(alnumStarNode), starLevel)
+	val numStarNode = nf.build(numStar, setOf(alnumStarNode), starLevel)
+	val punctStarNode = nf.build(punctStar, setTop, starLevel)
 
 	// Level 1
 	var charLevel: Int = starLevel-1
 	var level1Nodes = mutableSetOf<Node>()
 	for (rule in allAlphas) {
-	    level1Nodes += Node(rule, setOf(alphaStarNode), charLevel)
+	    level1Nodes += nf.build(rule, setOf(alphaStarNode), charLevel)
 	}
 	for (rule in allNums) {
-	    level1Nodes += Node(rule, setOf(numStarNode), charLevel)
+	    level1Nodes += nf.build(rule, setOf(numStarNode), charLevel)
 	}
 	for (rule in allPuncts) {
-	    level1Nodes += Node(rule, setOf(punctStarNode), charLevel)
+	    level1Nodes += nf.build(rule, setOf(punctStarNode), charLevel)
 	}
 
 	// Bottom level
-	bottom = Node("", level1Nodes, charLevel-1)
+	bottom = nf.build("", level1Nodes, charLevel-1)
 
 	for (node in level1Nodes) {
 	    level1Map[node.rule] = node
@@ -79,8 +49,8 @@ class Lattice {
     }
 
     fun meet(n1: Node, n2: Node): Node {
-	val alln1 = allParents(n1)
-	val alln2 = allParents(n2)
+	val alln1 = n1.allParents()
+	val alln2 = n2.allParents()
 	val commonParents = alln1.intersect(alln2)
 	var lub: Node = top
 	commonParents.forEach {
@@ -101,8 +71,7 @@ class Lattice {
 
 	var prevRegexIdx: Int = 0
 	var tokenIdx: Int = 0
-	var prevNode = Node.allNodes.getValue(parseTokenPrefix(prevRegex,
-							 prevRegexIdx))
+	var prevNode = nf.getByPrefix(prevRegex, prevRegexIdx)
 	var curNode = prevNode
 	var finalRegex = ""
 	while (tokenIdx < token.length) {
@@ -113,7 +82,7 @@ class Lattice {
 	    println("prevNode.rule: ${prevNode.rule}")
 	    println("curNode.rule: ${curNode.rule}")
 
-	    val newNode = Node.allNodes.getValue(parseTokenPrefix(token, tokenIdx))
+	    val newNode = nf.getByPrefix(token, tokenIdx)
 	    if (prevNode.isTop() || newNode.isTop()) {
 		return top.rule
 	    }
@@ -135,8 +104,7 @@ class Lattice {
 	    if (lub.isTop()) {
 		println("Backtracking. finalRegex before: $finalRegex")
 
-		val finalNode = Node.allNodes.getValue(
-		    parseTokenSuffix(finalRegex, finalRegex.length))
+		val finalNode = nf.getBySuffix(finalRegex, finalRegex.length)
 		if (meet(finalNode, curNode).isTop()) {
                     prevRegexIdx -= prevNode.rule.length
 		} else {
@@ -174,8 +142,7 @@ class Lattice {
 		if (prevRegexIdx >= prevRegex.length) {
 		    break
 		}
-		prevNode = Node.allNodes.getValue(parseTokenPrefix(prevRegex,
-							     prevRegexIdx))
+		prevNode = nf.getByPrefix(prevRegex, prevRegexIdx)
 		curNode = prevNode
 
 		println("finalRegex after backtracking: $finalRegex")
@@ -185,8 +152,7 @@ class Lattice {
 		if (prevRegexIdx >= prevRegex.length) {
 		    break
 		}
-		prevNode = Node.allNodes.getValue(parseTokenPrefix(prevRegex,
-							     prevRegexIdx))
+		prevNode = nf.getByPrefix(prevRegex, prevRegexIdx)
 		curNode = prevNode
 	    }
 	}
@@ -194,8 +160,7 @@ class Lattice {
 	println("Final regex before adding leftover: $finalRegex")
 
 	// Add leftovers from previous regex and token, if there are any.
-	curNode = Node.allNodes.getValue(parseTokenSuffix(finalRegex,
-							  finalRegex.length))
+	curNode = nf.getBySuffix(finalRegex, finalRegex.length)
 	val leftoverPrev = getLeftover(prevRegex, prevRegexIdx)
 	if (leftoverPrev.isTop()) {
 	    return top.rule
@@ -231,16 +196,13 @@ class Lattice {
     fun backtrack(s: String, prevOffset: Int): BacktrackResult {
 	println("Backtracking $s with offset $prevOffset")
 
-	var parsedToken = parseTokenPrefix(s, prevOffset)
-	println("Parsed token: $parsedToken")
-	var curNode = Node.allNodes.getValue(parsedToken)
+	var curNode = nf.getByPrefix(s, prevOffset)
 	var offset: Int = prevOffset
 
 	// Propose to parse the suffix from the right, instead of from the left.
 	var proposal: Node? = null
 	if (curNode.level < 2 && prevOffset+1 < s.length) {
-	    proposal = Node.allNodes.getValue(
-		parseTokenSuffix(s, prevOffset+1))
+	    proposal = nf.getBySuffix(s, prevOffset+1)
 	    if (proposal.level > curNode.level) {
 		curNode = proposal
 		offset = prevOffset+1
@@ -259,7 +221,7 @@ class Lattice {
 	//
 	// Backward
 	while (offset > 0) {
-	    var newNode = Node.allNodes.getValue(parseTokenSuffix(s, offset))
+	    var newNode = nf.getBySuffix(s, offset)
 
 	    val lub = meet(curNode, newNode)
 	    if (lub.isTop()) {
@@ -274,7 +236,7 @@ class Lattice {
 	// Forward
 	offset = prevOffset
 	while (offset < s.length) {
-	    var newNode = Node.allNodes.getValue(parseTokenPrefix(s, offset))
+	    var newNode = nf.getByPrefix(s, offset)
 
 	    val lub = meet(curNode, newNode)
 	    if (lub.isTop()) {
@@ -305,7 +267,7 @@ class Lattice {
 	}
 
 	var idx = sidx
-	var curNode = Node.allNodes.getValue(parseTokenPrefix(s, idx))
+	var curNode = nf.getByPrefix(s, idx)
 
 	idx += curNode.rule.length
 
@@ -315,8 +277,7 @@ class Lattice {
 	}
 
 	while (idx < s.length) {
-	    val newRegex = parseTokenPrefix(s, idx)
-	    val newNode = Node.allNodes.getValue(newRegex)
+	    val newNode = nf.getByPrefix(s, idx)
 	    val lub: Node = meet(curNode, newNode)
 
 	    println("curNode.rule: ${curNode.rule}")
