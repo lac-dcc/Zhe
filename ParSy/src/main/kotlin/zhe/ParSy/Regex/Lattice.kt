@@ -113,8 +113,11 @@ class Lattice {
 	    println("prevNode.rule: ${prevNode.rule}")
 	    println("curNode.rule: ${curNode.rule}")
 
-	    val c: String = token[tokenIdx].toString()
-	    val newNode = Node.allNodes.getValue(c)
+	    val newNode = Node.allNodes.getValue(parseTokenPrefix(token, tokenIdx))
+	    if (prevNode.isTop() || newNode.isTop()) {
+		return top.rule
+	    }
+
 	    val lub: Node = meet(curNode, newNode)
 
 	    println("newNode.rule: ${newNode.rule}")
@@ -126,7 +129,7 @@ class Lattice {
 		    finalRegex += lub.rule
 		    curNode = lub
 		}
-		tokenIdx++
+		tokenIdx += newNode.rule.length
 	    }
 
 	    if (lub.isTop()) {
@@ -135,9 +138,10 @@ class Lattice {
 		val finalNode = Node.allNodes.getValue(
 		    parseTokenSuffix(finalRegex, finalRegex.length))
 		if (meet(finalNode, curNode).isTop()) {
-		    prevRegexIdx -= prevNode.rule.length
+                    prevRegexIdx -= prevNode.rule.length
 		} else {
-		    tokenIdx--
+                    tokenIdx -= newNode.rule.length
+		    println("Subtracting ${newNode.rule.length} from tokenIdx")
 		}
 		if (tokenIdx < 0) {
 		    tokenIdx = 0
@@ -227,11 +231,29 @@ class Lattice {
     fun backtrack(s: String, prevOffset: Int): BacktrackResult {
 	println("Backtracking $s with offset $prevOffset")
 
-	var curNode = Node.allNodes.getValue(parseTokenPrefix(s, prevOffset))
+	var parsedToken = parseTokenPrefix(s, prevOffset)
+	println("Parsed token: $parsedToken")
+	var curNode = Node.allNodes.getValue(parsedToken)
 	var offset: Int = prevOffset
 
-	val left: Int
-	val right: Int
+	// Propose to parse the suffix from the right, instead of from the left.
+	var proposal: Node? = null
+	if (curNode.level < 2 && prevOffset+1 < s.length) {
+	    proposal = Node.allNodes.getValue(
+		parseTokenSuffix(s, prevOffset+1))
+	    if (proposal.level > curNode.level) {
+		curNode = proposal
+		offset = prevOffset+1
+	    } else {
+		// Reject proposal
+		proposal = null
+	    }
+	}
+
+	var left: Int
+	var right: Int
+
+	println("Cur node before doing anything: ${curNode.rule}")
 
 	// Go backwards and forwards eating up everything we can.
 	//
@@ -263,6 +285,10 @@ class Lattice {
 	    curNode = lub
 	}
 	right = offset
+
+	if (proposal != null) {
+	    right++
+	}
 
 	println("Result of backtracking $s: ${curNode.rule}")
 

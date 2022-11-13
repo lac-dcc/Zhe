@@ -266,12 +266,36 @@ class TransformTest {
     fun transformSingleNumAndMultipleAlpha() {
 	// Previously, this test case was resulting in \p{Alnum}*\p{Alpha} . It
 	// was a problem in the leftovers part.
-    	var actual = lattice.transform("#\\d*", "#\\d*")
-    	var expected = "#\\d*"
+    	var actual = lattice.transform("7", "system")
+    	var expected = "\\p{Alnum}*"
     	assertEquals(expected, actual)
     }
 
-    // TODO: How to solve these cases :/ ? -aholmquist 2022-10-08
+    @Test
+    fun transformWordsAndPunctuationMixed() {
+    	var actual = lattice.transform("word1", "word2")
+    	actual = lattice.transform(actual, "word3")
+    	actual = lattice.transform(actual, "---")
+    	actual = lattice.transform(actual, "==")
+    	var expected = ".*"
+    	assertEquals(expected, actual)
+    }
+
+    @Test
+    fun transformTokenIsRegex() {
+    	var actual = lattice.transform("123.123.123.123", "\\d*.\\d*.\\d*.4\\d*")
+    	var expected = "\\d*.\\d*.\\d*.\\d*"
+    	assertEquals(expected, actual)
+    }
+
+    @Test
+    fun transformCrazyPunctuationSpam() {
+    	var actual = lattice.transform("12312-3-1=231-=3", "111-=-12=-312-23-=")
+    	var expected = "\\d*\\p{Punct}*\\d*\\p{Punct}*\\d*\\p{Punct}*\\d*-=\\d*"
+    	assertEquals(expected, actual)
+    }
+
+    // // TODO: How to solve these cases :/ ? -aholmquist 2022-10-08
     // @Test
     // fun transformPunctWithAndWithoutAlphaAndDifferentAmountsOfPunct() {
     // 	var actual = lattice.transform("ab.", "ab..a")

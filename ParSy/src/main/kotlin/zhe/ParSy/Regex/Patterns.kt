@@ -4,6 +4,7 @@ val alphaStar = "\\p{Alpha}*"
 val numStar = "\\d*"
 val alnumStar = "\\p{Alnum}*"
 val punctStar = "\\p{Punct}*"
+val dotStar = ".*"
 
 val allAlphas: List<String> = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "k",
 				   "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
@@ -19,7 +20,7 @@ val allPuncts: List<String> = listOf("!", "\"", "#", """$""", "%", "&", "'", "("
 				   "{", "|", "}", "~")
 
 fun parseTokenPrefix(regexStr: String, offset: Int): String {
-    var s = regexStr.substring(offset)
+    val s = regexStr.substring(offset)
     if (s.length < 1) {
 	return ""
     } else if (s.startsWith(alphaStar)) {
@@ -30,6 +31,8 @@ fun parseTokenPrefix(regexStr: String, offset: Int): String {
 	return alnumStar
     } else if (s.startsWith(punctStar)) {
 	return punctStar
+    } else if (s.startsWith(dotStar)) {
+	return dotStar
     } else {
 	// Single character
 	return s[0].toString()
@@ -48,6 +51,8 @@ fun parseTokenSuffix(regexStr: String, offset: Int): String {
 	return alnumStar
     } else if (s.endsWith(punctStar)) {
 	return punctStar
+    } else if (s.endsWith(dotStar)) {
+	return dotStar
     } else {
 	// Single character
 	return s[s.length - 1].toString()
