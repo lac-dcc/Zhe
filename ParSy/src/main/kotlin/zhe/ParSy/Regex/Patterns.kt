@@ -5,19 +5,30 @@ val numStar = "\\d*"
 val alnumStar = "\\p{Alnum}*"
 val punctStar = "\\p{Punct}*"
 val dotStar = ".*"
+val allStars: List<String> = listOf(alphaStar, numStar, alnumStar, punctStar,
+				    dotStar)
 
-val allAlphas: List<String> = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "k",
-				   "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
-				   "v", "w", "x", "y", "z",
-				   "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-				   "K", "L", "M", "N", "O", "P", "R", "S", "T", "U",
-				   "V", "W", "X", "Y", "Z")
+val allAlphas: List<String> = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+				     "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+				     "u", "v", "w", "x", "y", "z",
+				     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+				     "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+				     "U", "V", "W", "X", "Y", "Z")
 val allNums: List<String> = listOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
 val allAlnums: List<String> = allAlphas + allNums
 val allPuncts: List<String> = listOf("!", "\"", "#", """$""", "%", "&", "'", "(", ")",
 				   "*", "+", ",", "-", ".", "/", ":", ";", "<", "=",
 				   ">", "?", "@", "[", "\\", "]", "^", "_", "`",
 				   "{", "|", "}", "~")
+val allChars = allAlnums + allPuncts
+
+val starsToChars: Map<String, List<String>> = mapOf(
+    alphaStar to allAlphas,
+    numStar to allNums,
+    alnumStar to allAlnums,
+    punctStar to allPuncts,
+    dotStar to allChars,
+)
 
 fun parseTokenPrefix(regexStr: String, offset: Int): String {
     val s = regexStr.substring(offset)
