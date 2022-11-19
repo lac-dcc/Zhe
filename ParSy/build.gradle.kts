@@ -20,9 +20,15 @@ plugins {
     id("org.unbroken-dome.test-sets") version "4.0.0"
 }
 
+dependencies {
+    implementation("org.slf4j:slf4j-log4j12:2.0.3")
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+}
+
 val fatJar = task("fatJar", type = Jar::class) {
-    description = "Creates a self-contained fat JAR of the application " +
-        "that can be run."
+    description = "Creates a self-contained fat JAR of the application ."
     manifest {
         attributes["Implementation-Title"] = projectName
         attributes["Implementation-Version"] = projectVersion
@@ -56,12 +62,9 @@ application {
     mainClassName = applicationMainClassName
 }
 
-dependencies {
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-}
-
 tasks.test {
+    testLogging.showStandardStreams = true
+
     useJUnitPlatform() // JUnit5
 
     testLogging {

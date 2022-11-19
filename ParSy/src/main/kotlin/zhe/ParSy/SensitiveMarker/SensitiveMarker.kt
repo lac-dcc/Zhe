@@ -1,13 +1,15 @@
 package zhe.ParSy.SensitiveMarker
 
+import org.slf4j.LoggerFactory
 import kotlin.text.Regex
 
 class SensitiveMarker(val tokenDelimeter: String) {
+    private val logger = LoggerFactory.getLogger(this.javaClass.name)
 
     private val sensitiveRegex = Regex("<(\\p{Alnum}+)>(.+)</\\1>")
 
     fun findSensitiveTokens(ln: String): Pair<List<Int>?, String> {
-        println("In findSensitiveTokens. Received line: $ln")
+        logger.debug("In findSensitiveTokens. Received line: $ln")
 
         // Remove cases where the delimeter is given in sequence.
         val moreThanOneDelimeter = Regex("($tokenDelimeter){2,}")
@@ -35,7 +37,7 @@ class SensitiveMarker(val tokenDelimeter: String) {
             tokenPositionToIndexPointer += token.length + tokenDelimeter.length
         }
         val lastWordIndex = indexInLine - 1
-        println("Token position to index map: $tokenPositionToIndex")
+        logger.debug("Token position to index map: $tokenPositionToIndex")
 
         var matchIndexes = mutableListOf<Int>()
         var nonMarkedLine = ""
@@ -58,7 +60,7 @@ class SensitiveMarker(val tokenDelimeter: String) {
                 matchIndexes += matchedWordIndexInLine
                 matchedWordIndexInLine++
             }
-            println("Matched word index in line: $matchedWordIndexInLine")
+            logger.debug("Matched word index in line: $matchedWordIndexInLine")
 
             // TODO: try to refactor this -aholmquist 2022-10-30
             //
@@ -77,7 +79,7 @@ class SensitiveMarker(val tokenDelimeter: String) {
                 nonMarkedLine += tokenDelimeter
                 nonMarkedLineIdx += tokenDelimeter.length
             }
-            println("Non marked line: $nonMarkedLine")
+            logger.debug("Non marked line: $nonMarkedLine")
         }
         // Add rest of the line
         if (nonMarkedLineIdx < cleanLine.length) {

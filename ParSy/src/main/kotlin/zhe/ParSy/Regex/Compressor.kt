@@ -1,5 +1,7 @@
 package zhe.ParSy.Regex
 
+import org.slf4j.LoggerFactory
+
 data class CompressResult(
     val rule: String,
     val isTop: Boolean
@@ -8,6 +10,8 @@ data class CompressResult(
 class Compressor(
     private val nf: NodeFactory
 ) {
+    private val logger = LoggerFactory.getLogger(this.javaClass.name)
+
     private val lattice = Lattice(nf)
 
     companion object {
@@ -30,12 +34,12 @@ class Compressor(
         var curNode = prevNode
         var finalRegex = ""
         while (tokenIdx < token.length) {
-            println("New iteration.")
-            println("finalRegex: $finalRegex")
-            println("tokenIdx: $tokenIdx")
-            println("prevRegexIdx: $prevRegexIdx")
-            println("prevNode.rule: ${prevNode.rule}")
-            println("curNode.rule: ${curNode.rule}")
+            logger.debug("New iteration.")
+            logger.debug("finalRegex: $finalRegex")
+            logger.debug("tokenIdx: $tokenIdx")
+            logger.debug("prevRegexIdx: $prevRegexIdx")
+            logger.debug("prevNode.rule: ${prevNode.rule}")
+            logger.debug("curNode.rule: ${curNode.rule}")
 
             val newNode = nf.getByPrefix(token, tokenIdx)
             if (lattice.isTop(prevNode) || lattice.isTop(newNode)) {
@@ -44,12 +48,12 @@ class Compressor(
 
             val lub = lattice.meet(curNode, newNode)
 
-            println("newNode.rule: ${newNode.rule}")
-            println("lub.rule: ${lub.rule}")
+            logger.debug("newNode.rule: ${newNode.rule}")
+            logger.debug("lub.rule: ${lub.rule}")
 
             if (!lattice.isTop(lub)) {
                 if (!(lub.level > 1 && finalRegex.endsWith(lub.rule))) {
-                    println("Adding '${lub.rule}' to final regex")
+                    logger.debug("Adding '${lub.rule}' to final regex")
                     finalRegex += lub.rule
                     curNode = lub
                 }
@@ -57,14 +61,14 @@ class Compressor(
             }
 
             if (lattice.isTop(lub)) {
-                println("Backtracking. finalRegex before: $finalRegex")
+                logger.debug("Backtracking. finalRegex before: $finalRegex")
 
                 val finalNode = nf.getBySuffix(finalRegex, finalRegex.length)
                 if (lattice.isTop(lattice.meet(finalNode, curNode))) {
                     prevRegexIdx -= prevNode.rule.length
                 } else {
                     tokenIdx -= newNode.rule.length
-                    println("Subtracting ${newNode.rule.length} from tokenIdx")
+                    logger.debug("Subtracting ${newNode.rule.length} from tokenIdx")
                 }
                 if (tokenIdx < 0) {
                     tokenIdx = 0
@@ -95,8 +99,8 @@ class Compressor(
                 prevRegexIdx = prevResult.right
                 tokenIdx = tokenResult.right
 
-                println("New prevRegexIdx: $prevRegexIdx")
-                println("New tokenIdx: $tokenIdx")
+                logger.debug("New prevRegexIdx: $prevRegexIdx")
+                logger.debug("New tokenIdx: $tokenIdx")
 
                 if (prevRegexIdx >= prevRegex.length) {
                     break
@@ -104,7 +108,7 @@ class Compressor(
                 prevNode = nf.getByPrefix(prevRegex, prevRegexIdx)
                 curNode = prevNode
 
-                println("finalRegex after backtracking: $finalRegex")
+                logger.debug("finalRegex after backtracking: $finalRegex")
             } else if (prevNode.level == 1) {
                 prevRegexIdx += prevNode.rule.length
                 if (prevRegexIdx >= prevRegex.length) {
@@ -115,7 +119,7 @@ class Compressor(
             }
         }
 
-        println("Final regex before adding leftover: $finalRegex")
+        logger.debug("Final regex before adding leftover: $finalRegex")
 
         // Add leftovers from previous regex and token, if there are any.
         curNode = nf.getBySuffix(finalRegex, finalRegex.length)
@@ -127,7 +131,7 @@ class Compressor(
         if (lubPrev.rule != curNode.rule) {
             finalRegex += leftoverPrev.rule
         }
-        println("final first left over: ${curNode.rule}")
+        logger.debug("final first left over: ${curNode.rule}")
         val leftoverToken = getLeftover(token, tokenIdx)
         if (lattice.isTop(leftoverToken)) {
             return CompressResult(lattice.top.rule, true)
@@ -137,7 +141,7 @@ class Compressor(
             finalRegex += leftoverToken.rule
         }
 
-        println("Final regex after adding leftovers: $finalRegex")
+        logger.debug("Final regex after adding leftovers: $finalRegex")
 
         if (finalRegex == "") {
             return CompressResult(lattice.top.rule, true)
@@ -159,7 +163,7 @@ class Compressor(
     )
 
     fun backtrack(s: String, prevOffset: Int): BacktrackResult {
-        println("Backtracking $s with offset $prevOffset")
+        logger.debug("Backtracking $s with offset $prevOffset")
 
         var curNode = nf.getByPrefix(s, prevOffset)
         var offset: Int = prevOffset
@@ -180,7 +184,7 @@ class Compressor(
         var left: Int
         var right: Int
 
-        println("Cur node before doing anything: ${curNode.rule}")
+        logger.debug("Cur node before doing anything: ${curNode.rule}")
 
         // Go backwards and forwards eating up everything we can.
         //
@@ -217,17 +221,17 @@ class Compressor(
             right++
         }
 
-        println("Result of backtracking $s: ${curNode.rule}")
+        logger.debug("Result of backtracking $s: ${curNode.rule}")
 
         return BacktrackResult(curNode.rule, left, right, curNode)
     }
 
     fun getLeftover(s: String, sidx: Int): Node {
-        println("Getting leftover for $s sidx: $sidx")
+        logger.debug("Getting leftover for $s sidx: $sidx")
 
         if (sidx >= s.length) {
             // No leftover
-            println("No leftover")
+            logger.debug("No leftover")
             return lattice.bottom
         }
 
@@ -245,9 +249,9 @@ class Compressor(
             val newNode = nf.getByPrefix(s, idx)
             val lub = lattice.meet(curNode, newNode)
 
-            println("curNode.rule: ${curNode.rule}")
-            println("newNode.rule: ${newNode.rule}")
-            println("lub.rule: ${lub.rule}")
+            logger.debug("curNode.rule: ${curNode.rule}")
+            logger.debug("newNode.rule: ${newNode.rule}")
+            logger.debug("lub.rule: ${lub.rule}")
 
             if (lattice.isTop(lub)) {
                 // No match!
@@ -257,7 +261,7 @@ class Compressor(
             idx += newNode.rule.length
         }
 
-        println("Leftover: ${curNode.rule}")
+        logger.debug("Leftover: ${curNode.rule}")
         return curNode
     }
 }

@@ -1,5 +1,6 @@
 package zhe.ParSy.Merger
 
+import org.slf4j.LoggerFactory
 import zhe.ParSy.Grammar.HeapCNFGrammar
 import zhe.ParSy.Grammar.IGrammar
 import zhe.ParSy.Grammar.MutableRulesMap
@@ -10,6 +11,8 @@ import zhe.ParSy.Regex.Compressor
 import kotlin.math.max
 
 public class HeapCNFMerger : IMerger {
+
+    private val logger = LoggerFactory.getLogger(this.javaClass.name)
 
     companion object {
         // The compressor is used to compress grammar rules.
@@ -25,13 +28,13 @@ public class HeapCNFMerger : IMerger {
             return rules
         }
 
-        println("Compressing rules $rules")
+        logger.debug("Compressing rules $rules")
 
         var compressedRules = setOf<TerminalRule>()
         var otherRules = mutableSetOf<Rule>()
         var prevRegex = ""
         rules.forEach { rule ->
-            println("In new iteration in outer forEach")
+            logger.debug("In new iteration in outer forEach")
 
             if (rule !is TerminalRule) {
                 otherRules.plusAssign(rule)
@@ -39,7 +42,7 @@ public class HeapCNFMerger : IMerger {
             }
 
             if (compressedRules.size == 0) {
-                println("Compressed rules is empty")
+                logger.debug("Compressed rules is empty")
                 compressedRules = setOf<TerminalRule>(rule)
                 return@forEach
             }
@@ -47,14 +50,14 @@ public class HeapCNFMerger : IMerger {
             var newCompressedRules = mutableSetOf<TerminalRule>()
             var curRegex = rule.pattern
             compressedRules.forEach { prevRule ->
-                println(
+                logger.debug(
                     "In new iteration in inner forEach. " +
                         "Previous rule: ${prevRule.pattern}"
                 )
                 prevRegex = prevRule.pattern
                 val compressResult = compressor.compress(prevRegex, curRegex)
                 if (compressResult.isTop) {
-                    println("Went to top!")
+                    logger.debug("Went to top!")
                     newCompressedRules.plusAssign(prevRule)
                     return@forEach
                 } else {
@@ -66,8 +69,8 @@ public class HeapCNFMerger : IMerger {
             compressedRules = newCompressedRules
         }
 
-        println("Compressed rules: $compressedRules")
-        println("Other rules: $otherRules")
+        logger.debug("Compressed rules: $compressedRules")
+        logger.debug("Other rules: $otherRules")
 
         return compressedRules.union(otherRules)
     }
@@ -82,10 +85,10 @@ public class HeapCNFMerger : IMerger {
             val g2: ProductionRule = grammar.rules.getOrDefault(i, ProductionRule(i))
 
             val allRules: Set<Rule> = g1.rules.union(g2.rules)
-            println("Rules before compression: $allRules")
+            logger.debug("Rules before compression: $allRules")
 
             val compressedRules = compressRuleSet(allRules)
-            println("Compressed rules: $compressedRules")
+            logger.debug("Compressed rules: $compressedRules")
 
             newRules.put(i, ProductionRule(i, compressedRules))
         }
