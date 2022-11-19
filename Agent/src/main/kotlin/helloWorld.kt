@@ -14,4 +14,3 @@ class KotlinGreetingJoiner(val greeter: Greeter) {
         return "${greeter.getGreeting()} ${names.filterNotNull().joinToString(separator = " and ")}"
     }
 }
-

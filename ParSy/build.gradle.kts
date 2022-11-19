@@ -20,35 +20,35 @@ plugins {
     id("org.unbroken-dome.test-sets") version "4.0.0"
 }
 
-val fatJar = task("fatJar", type=Jar::class) {
-    description = "Creates a self-contained fat JAR of the application "+
-                  "that can be run."
+val fatJar = task("fatJar", type = Jar::class) {
+    description = "Creates a self-contained fat JAR of the application " +
+        "that can be run."
     manifest {
         attributes["Implementation-Title"] = projectName
-	attributes["Implementation-Version"] = projectVersion
+        attributes["Implementation-Version"] = projectVersion
         attributes["Main-Class"] = applicationMainClassName
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     val dependencies = configurations
-	.runtimeClasspath
-	.get()
-	.map(::zipTree)
+        .runtimeClasspath
+        .get()
+        .map(::zipTree)
     from(dependencies)
     with(tasks.jar.get())
 }
 
 tasks {
     "build" {
-	dependsOn(fatJar)
+        dependsOn(fatJar)
     }
     "distTar" {
-	dependsOn(fatJar)
+        dependsOn(fatJar)
     }
     "distZip" {
-	dependsOn(fatJar)
+        dependsOn(fatJar)
     }
     "startScripts" {
-	dependsOn(fatJar)
+        dependsOn(fatJar)
     }
 }
 
@@ -97,18 +97,19 @@ tasks.test {
                 logger.lifecycle("----")
                 logger.lifecycle("Test result: ${result.resultType}")
                 logger.lifecycle(
-                        "Test summary: ${result.testCount} tests, " +
+                    "Test summary: ${result.testCount} tests, " +
                         "${result.successfulTestCount} succeeded, " +
                         "${result.failedTestCount} failed, " +
-                        "${result.skippedTestCount} skipped")
+                        "${result.skippedTestCount} skipped"
+                )
                 failedTests.takeIf { it.isNotEmpty() }?.prefixedSummary("\tFailed Tests")
                 skippedTests.takeIf { it.isNotEmpty() }?.prefixedSummary("\tSkipped Tests:")
             }
         }
 
         private infix fun List<TestDescriptor>.prefixedSummary(subject: String) {
-                logger.lifecycle(subject)
-                forEach { test -> logger.lifecycle("\t\t${test.displayName()}") }
+            logger.lifecycle(subject)
+            forEach { test -> logger.lifecycle("\t\t${test.displayName()}") }
         }
 
         private fun TestDescriptor.displayName() = parent?.let { "${it.name} - $name" } ?: "$name"
