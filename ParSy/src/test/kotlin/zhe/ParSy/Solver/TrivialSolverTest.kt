@@ -46,30 +46,42 @@ public class TrivialSolverTest {
     @Test
     fun solveNoSensitive() {
         val tokens = "I am Bond".split(" ")
+        val rFactory = RuleFactory(HeapCNFGrammar.maxSize(tokens.size))
+        val r4 = rFactory.getTerminalRule("Bond", false)
+        val r3 = rFactory.getTerminalRule("am", false)
+        val r2 = rFactory.getABRule(r3, r4)
+        val r1 = rFactory.getTerminalRule("I", false)
+        val r0 = rFactory.getABRule(r1, r2)
+        val rmap = MutableRulesMap()
+        rmap[0] = r0
+        rmap[1] = r1
+        rmap[2] = r2
+        rmap[3] = r3
+        rmap[4] = r4
+        val expectedGrammar = HeapCNFGrammar(rmap)
         val sensitiveTokenIndexes = setOf<Int>()
-        val expectedGrammarString = """R0 :: R1 R2
-R1 :: <N>I
-R2 :: R3 R4
-R3 :: <N>am
-R4 :: <N>Bond
-"""
         val actualGrammar = solver.solve(tokens, sensitiveTokenIndexes)
-        val actualGrammarString = actualGrammar.toString()
-        assertEquals(expectedGrammarString, actualGrammarString)
+        assertEquals(expectedGrammar.rules, actualGrammar.rules)
     }
 
     @Test
     fun solveSensitive() {
         val tokens = "I am Bond".split(" ")
+        val rFactory = RuleFactory(HeapCNFGrammar.maxSize(tokens.size))
+        val r4 = rFactory.getTerminalRule("Bond", true)
+        val r3 = rFactory.getTerminalRule("am", false)
+        val r2 = rFactory.getABRule(r3, r4)
+        val r1 = rFactory.getTerminalRule("I", false)
+        val r0 = rFactory.getABRule(r1, r2)
+        val rmap = MutableRulesMap()
+        rmap[0] = r0
+        rmap[1] = r1
+        rmap[2] = r2
+        rmap[3] = r3
+        rmap[4] = r4
+        val expectedGrammar = HeapCNFGrammar(rmap)
         val sensitiveTokenIndexes = setOf<Int>(2)
-        val expectedGrammarString = """R0 :: R1 R2
-R1 :: <N>I
-R2 :: R3 R4
-R3 :: <N>am
-R4 :: <S>Bond
-"""
         val actualGrammar = solver.solve(tokens, sensitiveTokenIndexes)
-        val actualGrammarString = actualGrammar.toString()
-        assertEquals(expectedGrammarString, actualGrammarString)
+        assertEquals(expectedGrammar.rules, actualGrammar.rules)
     }
 }

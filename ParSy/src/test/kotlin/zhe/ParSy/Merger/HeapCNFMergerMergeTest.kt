@@ -2,6 +2,12 @@ package zhe.ParSy.Merger
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import zhe.ParSy.Factory.RuleFactory
+import zhe.ParSy.Grammar.HeapCNFGrammar
+import zhe.ParSy.Grammar.MutableRulesMap
+import zhe.ParSy.Grammar.Rule
+import zhe.ParSy.Grammar.Rule.ABRule
+import zhe.ParSy.Grammar.Rule.TerminalRule
 import zhe.ParSy.Solver.TrivialSolver
 
 public class HeapCNFMergerMergeTest {
@@ -47,20 +53,38 @@ public class HeapCNFMergerMergeTest {
     fun mergeTwoGrammarsSameSizeButDifferent() {
         val grammar1 = solver.solve(fixtureExamples[0].split(delim), setOf<Int>())
         val grammar2 = solver.solve(fixtureExamples[1].split(delim), setOf<Int>())
-        val expectedGrammarString = """R0 :: R1 R2
-R1 :: <N>\p{Alpha}*
-R2 :: R3 R4
-R3 :: <N>\p{Alpha}*
-R4 :: R5 R6
-R5 :: <N>\p{Alpha}*
-R6 :: <N>1.2.3.4:54321 | R7 R8
-R7 :: <N>bond,
-R8 :: R9 R10
-R9 :: <N>James
-R10 :: <N>Bond
-"""
+        val rFactory = RuleFactory(11)
+        val r10 = rFactory.getTerminalRule("Bond", false)
+        val r9 = rFactory.getTerminalRule("James", false)
+        val r8 = rFactory.getABRule(r9, r10)
+        val r7 = rFactory.getTerminalRule("bond,", false)
+        val r6 = rFactory.getProductionRule(
+            setOf<Rule>(
+                TerminalRule("1.2.3.4:54321"),
+                ABRule(7, 8)
+            )
+        )
+        val r5 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r4 = rFactory.getABRule(r5, r6)
+        val r3 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r2 = rFactory.getABRule(r3, r4)
+        val r1 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r0 = rFactory.getABRule(r1, r2)
+        val rmap = MutableRulesMap()
+        rmap[0] = r0
+        rmap[1] = r1
+        rmap[2] = r2
+        rmap[3] = r3
+        rmap[4] = r4
+        rmap[5] = r5
+        rmap[6] = r6
+        rmap[7] = r7
+        rmap[8] = r8
+        rmap[9] = r9
+        rmap[10] = r10
+        val expectedGrammar = HeapCNFGrammar(rmap)
         val actualGrammar = merger.merge(grammar1, grammar2)
-        assertEquals(expectedGrammarString, actualGrammar.toString())
+        assertEquals(expectedGrammar.rules, actualGrammar.rules)
     }
 
     @Test
@@ -68,21 +92,39 @@ R10 :: <N>Bond
         val grammar1 = solver.solve(fixtureExamples[0].split(delim), setOf<Int>())
         val grammar2 = solver.solve(fixtureExamples[1].split(delim), setOf<Int>())
         val grammar3 = solver.solve(fixtureExamples[2].split(delim), setOf<Int>())
-        val expectedGrammarString = """R0 :: R1 R2
-R1 :: <N>\p{Alpha}*
-R2 :: R3 R4
-R3 :: <N>\p{Alpha}*
-R4 :: R5 R6
-R5 :: <N>\p{Alpha}*
-R6 :: <N>\d*.\d*.\d*.\d*:54321 | R7 R8
-R7 :: <N>bond,
-R8 :: R9 R10
-R9 :: <N>James
-R10 :: <N>Bond
-"""
+        val rFactory = RuleFactory(11)
+        val r10 = rFactory.getTerminalRule("Bond", false)
+        val r9 = rFactory.getTerminalRule("James", false)
+        val r8 = rFactory.getABRule(r9, r10)
+        val r7 = rFactory.getTerminalRule("bond,", false)
+        val r6 = rFactory.getProductionRule(
+            setOf<Rule>(
+                TerminalRule("\\d*.\\d*.\\d*.\\d*:54321"),
+                ABRule(7, 8)
+            )
+        )
+        val r5 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r4 = rFactory.getABRule(r5, r6)
+        val r3 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r2 = rFactory.getABRule(r3, r4)
+        val r1 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r0 = rFactory.getABRule(r1, r2)
+        val rmap = MutableRulesMap()
+        rmap[0] = r0
+        rmap[1] = r1
+        rmap[2] = r2
+        rmap[3] = r3
+        rmap[4] = r4
+        rmap[5] = r5
+        rmap[6] = r6
+        rmap[7] = r7
+        rmap[8] = r8
+        rmap[9] = r9
+        rmap[10] = r10
+        val expectedGrammar = HeapCNFGrammar(rmap)
         var actualGrammar = merger.merge(grammar1, grammar2)
         actualGrammar = merger.merge(actualGrammar, grammar3)
-        assertEquals(expectedGrammarString, actualGrammar.toString())
+        assertEquals(expectedGrammar.rules, actualGrammar.rules)
     }
 
     @Test
@@ -90,20 +132,38 @@ R10 :: <N>Bond
         val grammar1 = solver.solve(fixtureExamples[0].split(delim), setOf<Int>())
         val grammar2 = solver.solve(fixtureExamples[1].split(delim), setOf<Int>(3))
         val grammar3 = solver.solve(fixtureExamples[2].split(delim), setOf<Int>())
-        val expectedGrammarString = """R0 :: R1 R2
-R1 :: <N>\p{Alpha}*
-R2 :: R3 R4
-R3 :: <N>\p{Alpha}*
-R4 :: R5 R6
-R5 :: <N>\p{Alpha}*
-R6 :: <S>\d*.\d*.\d*.\d*:54321 | R7 R8
-R7 :: <N>bond,
-R8 :: R9 R10
-R9 :: <N>James
-R10 :: <N>Bond
-"""
+        val rFactory = RuleFactory(11)
+        val r10 = rFactory.getTerminalRule("Bond", false)
+        val r9 = rFactory.getTerminalRule("James", false)
+        val r8 = rFactory.getABRule(r9, r10)
+        val r7 = rFactory.getTerminalRule("bond,", false)
+        val r6 = rFactory.getProductionRule(
+            setOf<Rule>(
+                TerminalRule("\\d*.\\d*.\\d*.\\d*:54321", true),
+                ABRule(7, 8)
+            )
+        )
+        val r5 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r4 = rFactory.getABRule(r5, r6)
+        val r3 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r2 = rFactory.getABRule(r3, r4)
+        val r1 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r0 = rFactory.getABRule(r1, r2)
+        val rmap = MutableRulesMap()
+        rmap[0] = r0
+        rmap[1] = r1
+        rmap[2] = r2
+        rmap[3] = r3
+        rmap[4] = r4
+        rmap[5] = r5
+        rmap[6] = r6
+        rmap[7] = r7
+        rmap[8] = r8
+        rmap[9] = r9
+        rmap[10] = r10
+        val expectedGrammar = HeapCNFGrammar(rmap)
         var actualGrammar = merger.merge(grammar1, grammar2)
         actualGrammar = merger.merge(actualGrammar, grammar3)
-        assertEquals(expectedGrammarString, actualGrammar.toString())
+        assertEquals(expectedGrammar.rules, actualGrammar.rules)
     }
 }
