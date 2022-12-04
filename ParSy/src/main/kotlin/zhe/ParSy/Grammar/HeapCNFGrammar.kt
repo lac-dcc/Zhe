@@ -1,8 +1,10 @@
 package zhe.ParSy.Grammar
 
+import zhe.ParSy.Grammar.Rule.ProductionRule
+
 public class HeapCNFGrammar : IGrammar {
     override val rules: RulesMap
-    override val root: Rule
+    override val root: ProductionRule
         get() = this.rules[0]!!
 
     constructor(rules: RulesMap) {
@@ -10,15 +12,7 @@ public class HeapCNFGrammar : IGrammar {
     }
 
     override fun toString(): String {
-        var output: String = "grammar ZheGrammar;\n\n"
-
-        // Sort first for consistency when printing map.
-        val sortedRules = rules.toSortedMap()
-        sortedRules.forEach { _, rule ->
-            output += rule.toString() + "\n"
-        }
-
-        return output
+        return AntlrPrinter(this).toString()
     }
 
     companion object {

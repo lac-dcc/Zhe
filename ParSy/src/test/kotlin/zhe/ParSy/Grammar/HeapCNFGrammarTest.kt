@@ -1,23 +1,22 @@
 package zhe.ParSy.Grammar
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import zhe.ParSy.Solver.TrivialSolver
 
 public class HeapCNFGrammarTest {
     @Test
-    fun rootIsR0() {
+    fun rootIsRule0() {
         val tokens = "My name is Bond, James Bond".split(" ")
         val sensitiveTokenIndexes = setOf<Int>()
         val solver = TrivialSolver()
         val grammar = solver.solve(tokens, sensitiveTokenIndexes)
         val rootRule = grammar.root
-        assertTrue(rootRule.toString().startsWith("R0"))
+        assertEquals(0, rootRule.id)
     }
 
     @Test
-    fun grammarToStr() {
+    fun grammarToStringHelloWorld() {
         val tokens = "Hello World".split(" ")
         val sensitiveTokenIndexes = setOf<Int>()
         val solver = TrivialSolver()
@@ -25,10 +24,23 @@ public class HeapCNFGrammarTest {
         assertEquals(
             """grammar ZheGrammar;
 
-entrypoint: nonSensitive0;
-nonSensitive0: NON_SENSITIVE1 NON_SENSITIVE2;
-NON_SENSITIVE1: 'Hello';
-NON_SENSITIVE2: 'World';
+@members {
+	Map<String, Boolean> isSensitive = newHashMap<String, Boolean>();
+}
+r0: r1 r2 ;
+r1: TOKEN0 
+{
+	isSensitive.put(${"$"}TOKEN0.type, false);
+};
+r2: TOKEN1 
+{
+	isSensitive.put(${"$"}TOKEN1.type, false);
+};
+
+TOKEN0: [H][e][l][l][o];
+TOKEN1: [W][o][r][l][d];
+
+WHITESPACE: ' ' -> skip;
 """,
             grammar.toString()
         )

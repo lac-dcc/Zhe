@@ -8,6 +8,8 @@ import zhe.ParSy.Grammar.MutableRulesMap
 import zhe.ParSy.Grammar.Rule
 import zhe.ParSy.Grammar.Rule.ABRule
 import zhe.ParSy.Grammar.Rule.TerminalRule
+import zhe.ParSy.Regex.alphaStar
+import zhe.ParSy.Regex.numStar
 import zhe.ParSy.Solver.TrivialSolver
 
 public class HeapCNFMergerMergeTest {
@@ -64,11 +66,11 @@ public class HeapCNFMergerMergeTest {
                 ABRule(7, 8)
             )
         )
-        val r5 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r5 = rFactory.getTerminalRule("$alphaStar", false)
         val r4 = rFactory.getABRule(r5, r6)
-        val r3 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r3 = rFactory.getTerminalRule("$alphaStar", false)
         val r2 = rFactory.getABRule(r3, r4)
-        val r1 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r1 = rFactory.getTerminalRule("$alphaStar", false)
         val r0 = rFactory.getABRule(r1, r2)
         val rmap = MutableRulesMap()
         rmap[0] = r0
@@ -99,15 +101,15 @@ public class HeapCNFMergerMergeTest {
         val r7 = rFactory.getTerminalRule("bond,", false)
         val r6 = rFactory.getProductionRule(
             setOf<Rule>(
-                TerminalRule("\\d*.\\d*.\\d*.\\d*:54321"),
+                TerminalRule("$numStar.$numStar.$numStar.$numStar:54321"),
                 ABRule(7, 8)
             )
         )
-        val r5 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r5 = rFactory.getTerminalRule("$alphaStar", false)
         val r4 = rFactory.getABRule(r5, r6)
-        val r3 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r3 = rFactory.getTerminalRule("$alphaStar", false)
         val r2 = rFactory.getABRule(r3, r4)
-        val r1 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r1 = rFactory.getTerminalRule("$alphaStar", false)
         val r0 = rFactory.getABRule(r1, r2)
         val rmap = MutableRulesMap()
         rmap[0] = r0
@@ -139,15 +141,15 @@ public class HeapCNFMergerMergeTest {
         val r7 = rFactory.getTerminalRule("bond,", false)
         val r6 = rFactory.getProductionRule(
             setOf<Rule>(
-                TerminalRule("\\d*.\\d*.\\d*.\\d*:54321", true),
+                TerminalRule("$numStar.$numStar.$numStar.$numStar:54321", true),
                 ABRule(7, 8)
             )
         )
-        val r5 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r5 = rFactory.getTerminalRule("$alphaStar", false)
         val r4 = rFactory.getABRule(r5, r6)
-        val r3 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r3 = rFactory.getTerminalRule("$alphaStar", false)
         val r2 = rFactory.getABRule(r3, r4)
-        val r1 = rFactory.getTerminalRule("\\p{Alpha}*", false)
+        val r1 = rFactory.getTerminalRule("$alphaStar", false)
         val r0 = rFactory.getABRule(r1, r2)
         val rmap = MutableRulesMap()
         rmap[0] = r0

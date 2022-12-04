@@ -22,13 +22,13 @@ public class RuleTest {
     @Test
     fun abRuleToString() {
         val rule = ABRule(1, 2)
-        assertEquals("R1 R2", rule.toString())
+        assertEquals("r1 r2", rule.toString())
     }
 
     @Test
     fun simpleProductionRuleToString() {
         val rule = ProductionRule(0, TerminalRule("abc"))
-        assertEquals("R0 :: <N>abc", rule.toString())
+        assertEquals("r0: <N>abc", rule.toString())
     }
 
     @Test
@@ -39,6 +39,6 @@ public class RuleTest {
             TerminalRule("cba")
         )
         val rule = ProductionRule(0, childRules)
-        assertEquals("R0 :: R1 R2 | <N>abc | <N>cba", rule.toString())
+        assertEquals("r0: r1 r2 | <N>abc | <N>cba", rule.toString())
     }
 }

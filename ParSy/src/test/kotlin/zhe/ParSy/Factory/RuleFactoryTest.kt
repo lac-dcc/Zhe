@@ -9,7 +9,7 @@ public class RuleFactoryTest {
         val maxRules = 1
         val factory = RuleFactory(maxRules)
         val rule = factory.getTerminalRule("token1", false)
-        assertEquals("R0 :: <N>token1", rule.toString())
+        assertEquals("r0: <N>token1", rule.toString())
     }
 
     @Test
@@ -17,6 +17,6 @@ public class RuleFactoryTest {
         val maxRules = 1
         val factory = RuleFactory(maxRules)
         val rule = factory.getABRule(1, 2)
-        assertEquals("R0 :: R1 R2", rule.toString())
+        assertEquals("r0: r1 r2", rule.toString())
     }
 }

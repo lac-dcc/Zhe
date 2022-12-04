@@ -26,7 +26,7 @@ sealed class Rule() {
         }
     }
 
-    class ABRule(private val lRuleId: Int, private val rRuleId: Int) : Rule() {
+    class ABRule(val lRuleId: Int, val rRuleId: Int) : Rule() {
 
         fun lRule(table: RulesMap): Rule {
             return table[this.lRuleId]!!
@@ -37,7 +37,7 @@ sealed class Rule() {
         }
 
         override fun toString(): String {
-            return "R$lRuleId R$rRuleId"
+            return "r$lRuleId r$rRuleId"
         }
 
         override fun equals(other: Any?): Boolean {
@@ -58,7 +58,7 @@ sealed class Rule() {
         constructor(rid: Int, tRule: TerminalRule) : this(rid, setOf<Rule>(tRule))
 
         override fun toString(): String {
-            var output: String = "R${this.id} :: "
+            var output: String = "r${this.id}: "
             this.rules.forEachIndexed({ index: Int, rule: Rule ->
                 if (index > 0) {
                     output += " | "

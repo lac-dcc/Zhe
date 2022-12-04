@@ -1,9 +1,9 @@
 package zhe.ParSy.Regex
 
-val alphaStar = "\\p{Alpha}*"
-val numStar = "\\d*"
-val alnumStar = "\\p{Alnum}*"
-val punctStar = "\\p{Punct}*"
+val alphaStar = "[a-zA-Z]*"
+val numStar = "[0-9]*"
+val alnumStar = "[a-zA-Z0-9]*"
+val punctStar = "[\"!#\$%&'()*+,-./:;<>=?@\\[\\]^_`{}|~\\\\]*"
 val dotStar = ".*"
 val allStars: List<String> = listOf(
     alphaStar,
@@ -76,5 +76,37 @@ fun parseTokenSuffix(regexStr: String, offset: Int): String {
     } else {
         // Single character
         return s[s.length - 1].toString()
+    }
+}
+
+// TODO: put everything under class Pattern. Create class Token in separate
+// file.
+
+class Pattern {
+    companion object {
+        fun tokenize(s: String): String {
+            var tokenized = ""
+            val tokens = split(s)
+            tokens.forEach { token ->
+                if (token.length == 1) {
+                    tokenized += "[$token]"
+                } else {
+                    tokenized += "$token"
+                }
+            }
+            tokenized = tokenized.trim()
+            return tokenized
+        }
+
+        private fun split(s: String): List<String> {
+            var offset = 0
+            var tokens = mutableListOf<String>()
+            while (offset < s.length) {
+                val token = parseTokenPrefix(s, offset)
+                tokens += token
+                offset += token.length
+            }
+            return tokens
+        }
     }
 }
