@@ -12,7 +12,7 @@ public class HeapCNFGrammar : IGrammar {
     }
 
     override fun toString(): String {
-        return AntlrPrinter(this).toString()
+        return AntlrPrinter(this).string()
     }
 
     companion object {

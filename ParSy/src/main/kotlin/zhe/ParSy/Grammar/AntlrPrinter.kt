@@ -7,26 +7,44 @@ import zhe.ParSy.Regex.Pattern
 // AntlrPrinter is a grammar printer that is capable of printing a given grammar
 // in the Antlr syntax.
 public class AntlrPrinter(val grammar: IGrammar) {
-    override fun toString(): String {
-        var grammarStr = ""
+    private val sectionPrefix = "\n"
 
-        grammarStr += "grammar ZheGrammar;\n"
-        grammarStr += """
+    fun string(): String {
+        var grammarStr = ""
+	grammarStr += header()
+	val (bodyStr, terminalRules) = body()
+	grammarStr += bodyStr
+	grammarStr += footer(terminalRules)
+	return grammarStr
+    }
+
+    fun header(): String {
+	return """grammar ZheGrammar;
+
+@header {
+	import java.util.Map;
+	import java.util.HashMap;
+}
+
 @members {
-	Map<String, Boolean> isSensitive = newHashMap<String, Boolean>();
+	Map<String, Boolean> isSensitive = new HashMap<String, Boolean>();
 }
 """
+    }
+
+    fun body(): Pair<String, Map<Int, TerminalRule>> {
+	var s = sectionPrefix
         val sortedRules = grammar.rules.toSortedMap()
         var terminalRules = mutableMapOf<Int, TerminalRule>()
         var terminalRuleId = 0
         var newTerminalRuleIds = listOf<Int>()
         sortedRules.forEach { _, productionRule ->
-            grammarStr += "r${productionRule.id}: "
+            s += "r${productionRule.id}: "
             productionRule.rules.forEach { subRule ->
                 if (subRule is ABRule) {
-                    grammarStr += "r${subRule.lRuleId} r${subRule.rRuleId} "
+                    s += "r${subRule.lRuleId} r${subRule.rRuleId} "
                 } else if (subRule is TerminalRule) {
-                    grammarStr += "TOKEN$terminalRuleId "
+                    s += "TOKEN$terminalRuleId "
                     terminalRules[terminalRuleId] = subRule
                     newTerminalRuleIds += terminalRuleId
                     terminalRuleId++
@@ -34,30 +52,39 @@ public class AntlrPrinter(val grammar: IGrammar) {
             }
 
             if (newTerminalRuleIds.size > 0) {
-                grammarStr += "\n"
-                grammarStr += "{\n"
+                s += "\n"
+                s += "{\n"
                 // Add Antlr actions to set token as sensitive / not-sensitive.
                 newTerminalRuleIds.forEach { ruleId ->
-                    grammarStr += "\tisSensitive.put(\$TOKEN$ruleId.type, " +
+                    s += "\tisSensitive.put(\$TOKEN$ruleId.type, " +
                         "${terminalRules[ruleId]!!.isSensitive});\n"
                 }
-                grammarStr += "}"
+                s += "}"
                 // Reset list of terminal rules
                 newTerminalRuleIds = listOf<Int>()
             }
-            grammarStr += ";\n"
+            s += ";\n"
         }
+	return Pair(s, terminalRules)
+    }
 
+    fun footer(terminalRules: Map<Int, TerminalRule>): String {
+	return terminalTokenRules(terminalRules) +
+	       skipRules()
+    }
+
+    fun terminalTokenRules(terminalRules: Map<Int, TerminalRule>): String {
         // Add one rule per terminal token
-        grammarStr += "\n"
+	var s = sectionPrefix
         terminalRules.forEach { id, rule ->
-            grammarStr += "TOKEN$id: ${Pattern.tokenize(rule.pattern)};\n"
+            s += "TOKEN$id: ${Pattern.tokenize(rule.pattern)};\n"
         }
+	return s
+    }
 
-        // Add skip rules
-        grammarStr += "\n"
-        grammarStr += "WHITESPACE: ' ' -> skip;\n"
-
-        return grammarStr
+    fun skipRules(): String {
+        var s = sectionPrefix
+        s += "WHITESPACE: ' ' -> skip;\n"
+	return s
     }
 }

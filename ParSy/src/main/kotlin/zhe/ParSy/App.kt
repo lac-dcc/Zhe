@@ -46,6 +46,6 @@ fun main(args: Array<String>) {
     }
     println(g1)
 
-    val numSentencesInGrammar: Double = NumberOfSentencesInGrammar(g1).count()
-    print("$numLines $numSentencesInGrammar ${numLines / numSentencesInGrammar}")
+    // val numSentencesInGrammar: Double = NumberOfSentencesInGrammar(g1).count()
+    // print("$numLines $numSentencesInGrammar ${numLines / numSentencesInGrammar}")
 }
