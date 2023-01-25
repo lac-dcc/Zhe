@@ -2,7 +2,7 @@ package zhe.ParSy.Regex
 
 import org.slf4j.LoggerFactory
 
-data class CompressResult(
+data class CompressionResult(
     val rule: String,
     val isTop: Boolean
 )
@@ -20,12 +20,12 @@ class Compressor(
         }
     }
 
-    fun compress(prevRegex: String, token: String): CompressResult {
+    fun compress(prevRegex: String, token: String): CompressionResult {
         if (prevRegex == "") {
-            return CompressResult(token, lattice.isTop(token))
+            return CompressionResult(token, lattice.isTop(token))
         }
         if (prevRegex == token) {
-            return CompressResult(token, lattice.isTop(token))
+            return CompressionResult(token, lattice.isTop(token))
         }
 
         var prevRegexIdx: Int = 0
@@ -43,7 +43,7 @@ class Compressor(
 
             val newNode = nf.getByPrefix(token, tokenIdx)
             if (lattice.isTop(prevNode) || lattice.isTop(newNode)) {
-                return CompressResult(lattice.top.rule, true)
+                return CompressionResult(lattice.top.rule, true)
             }
 
             val lub = lattice.meet(curNode, newNode)
@@ -125,7 +125,7 @@ class Compressor(
         curNode = nf.getBySuffix(finalRegex, finalRegex.length)
         val leftoverPrev = getLeftover(prevRegex, prevRegexIdx)
         if (lattice.isTop(leftoverPrev)) {
-            return CompressResult(lattice.top.rule, true)
+            return CompressionResult(lattice.top.rule, true)
         }
         val lubPrev = lattice.meet(curNode, leftoverPrev)
         if (lubPrev.rule != curNode.rule) {
@@ -134,7 +134,7 @@ class Compressor(
         logger.debug("final first left over: ${curNode.rule}")
         val leftoverToken = getLeftover(token, tokenIdx)
         if (lattice.isTop(leftoverToken)) {
-            return CompressResult(lattice.top.rule, true)
+            return CompressionResult(lattice.top.rule, true)
         }
         val lubToken = lattice.meet(lubPrev, leftoverToken)
         if (lubPrev.rule != lubToken.rule) {
@@ -144,10 +144,10 @@ class Compressor(
         logger.debug("Final regex after adding leftovers: $finalRegex")
 
         if (finalRegex == "") {
-            return CompressResult(lattice.top.rule, true)
+            return CompressionResult(lattice.top.rule, true)
         }
 
-        return CompressResult(finalRegex, lattice.isTop(finalRegex))
+        return CompressionResult(finalRegex, lattice.isTop(finalRegex))
     }
 
     fun compressToString(prevRegex: String, token: String): String {

@@ -1,5 +1,9 @@
 package zhe.ParSy.Regex
 
+// interface BaseLattice {
+    
+// }
+
 class Lattice(
     private val nf: NodeFactory
 ) {
