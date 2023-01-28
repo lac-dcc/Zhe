@@ -18,44 +18,44 @@ class CompressorTest {
     @Test
     fun compressOneAlpha() {
         val actual = compressor.compressToString("", "a")
-        val expected = "[a]{1}"
+        val expected = "[a]{1,1}"
         assertEquals(expected, actual)
     }
 
-    // @Test
-    // fun compressOneNum() {
-    //     val actual = compressor.compressToString("", "1")
-    //     val expected = "1"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressOneNum() {
+        val actual = compressor.compressToString("", "1")
+        val expected = "[1]{1,1}"
+        assertEquals(expected, actual)
+    }
 
-    // @Test
-    // fun compressManyChar() {
-    //     val actual = compressor.compressToString("", "abcd")
-    //     val expected = "abcd"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressManyChar() {
+        val actual = compressor.compressToString("", "abcd")
+        val expected = "[a]{1,1}[b]{1,1}[c]{1,1}[d]{1,1}"
+        assertEquals(expected, actual)
+    }
 
-    // @Test
-    // fun compressManyNum() {
-    //     val actual = compressor.compressToString("", "1234")
-    //     val expected = "1234"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressManyNum() {
+        val actual = compressor.compressToString("", "1234")
+        val expected = "[1]{1,1}[2]{1,1}[3]{1,1}[4]{1,1}"
+        assertEquals(expected, actual)
+    }
 
-    // @Test
-    // fun compressFromExistingSingletonEqual() {
-    //     val actual = compressor.compressToString("a", "a")
-    //     val expected = "a"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressFromExistingSingletonEqual() {
+        val actual = compressor.compressToString("a", "a")
+        val expected = "[a]{1,1}"
+        assertEquals(expected, actual)
+    }
 
-    // @Test
-    // fun compressFromExistingSingletonDiff() {
-    //     val actual = compressor.compressToString("a", "b")
-    //     val expected = "$alphaStar"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressFromExistingSingletonDiff() {
+        val actual = compressor.compressToString("a", "b")
+        val expected = "[ab]{1,1}"
+        assertEquals(expected, actual)
+    }
 
     // @Test
     // fun compressFromExistingSingletonAlphaNum() {

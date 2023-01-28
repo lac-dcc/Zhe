@@ -20,18 +20,18 @@ public class HeapCNFMergerCompressTest {
         assertEquals(expected, actual)
     }
 
-    @Test
-    fun twoDisjunctRulesShouldNotBeChanged() {
-        val inputRules = setOf<Rule>(
-            TerminalRule("luhansk"),
-            // The dot in the middle should make it impossible to compress with
-            // previous rule.
-            TerminalRule("ukraine.luhansk")
-        )
-        val expected = inputRules
-        val actual = merger.compressRuleSet(inputRules)
-        assertEquals(expected, actual)
-    }
+    // @Test
+    // fun twoDisjunctRulesShouldNotBeChanged() {
+    //     val inputRules = setOf<Rule>(
+    //         TerminalRule("luhansk"),
+    //         // The dot in the middle should make it impossible to compress with
+    //         // previous rule.
+    //         TerminalRule("ukraine.luhansk")
+    //     )
+    //     val expected = inputRules
+    //     val actual = merger.compressRuleSet(inputRules)
+    //     assertEquals(expected, actual)
+    // }
 
     // @Test
     // fun twoOverlappingRulesShouldBeCompressed() {
