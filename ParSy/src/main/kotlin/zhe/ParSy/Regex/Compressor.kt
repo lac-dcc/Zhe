@@ -8,11 +8,13 @@ data class CompressionResult(
 )
 
 class Compressor(
-    private val nf: NodeFactory
+    private val nf: NodeFactory,
+    // TODO: remove default of empty list of nodes
+    private val baseNodes: List<Node> = listOf<Node>()
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass.name)
 
-    private val lattice = Lattice(nf, listOf<Node>())
+    private val lattice = Lattice(baseNodes)
 
     companion object {
         public fun newBasic(): Compressor {

@@ -47,7 +47,11 @@ class NodeFactory {
     fun buildString(nodes: List<Node>): String {
         var s = ""
         nodes.forEach {
-            s += "[${collapseCharset(it.charset)}]{${it.interval.first},${it.interval.second}}"
+            if (it.isKleene()) {
+                s += "[${collapseCharset(it.charset)}]*"
+            } else {
+                s += "[${collapseCharset(it.charset)}]{${it.interval.first},${it.interval.second}}"
+            }
         }
         return s
     }

@@ -6,7 +6,10 @@ import org.junit.jupiter.api.Test
 // TODO: add tests to test Inference Machine properties (iterative, set-driven,
 // etc) -aholmquist 2022-10-22
 class CompressorTest {
-    private val compressor = Compressor(NodeFactory())
+    private val compressor = Compressor(
+        NodeFactory(),
+        testBaseNodes
+    )
 
     @Test
     fun compressEmpty() {
@@ -57,12 +60,12 @@ class CompressorTest {
         assertEquals(expected, actual)
     }
 
-    // @Test
-    // fun compressFromExistingSingletonAlphaNum() {
-    //     val actual = compressor.compressToString("a", "1")
-    //     val expected = "$alnumStar"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressFromExistingSingletonAlphaNum() {
+        val actual = compressor.compressToString("a", "1")
+        val expected = "[abcdefghijklmnopqrstuvwxyz0123456789]*"
+        assertEquals(expected, actual)
+    }
 
     // @Test
     // fun compressFromExistingMultipleRepeated() {
