@@ -1,7 +1,7 @@
 package zhe.ParSy.Regex
 
 // interface BaseLattice {
-    
+
 // }
 
 class Lattice(

@@ -21,6 +21,12 @@ class Compressor(
     }
 
     fun compress(prevRegex: String, token: String): CompressionResult {
+        val fmtPrevRegex = Lexer.tokenize(prevRegex)
+        val fmtToken = Lexer.tokenize(token)
+        return compressFormatted(fmtPrevRegex, fmtToken)
+    }
+
+    fun compressFormatted(prevRegex: String, token: String): CompressionResult {
         if (prevRegex == "") {
             return CompressionResult(token, lattice.isTop(token))
         }
