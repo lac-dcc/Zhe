@@ -11,15 +11,15 @@ public class AntlrPrinter(val grammar: IGrammar) {
 
     fun string(): String {
         var grammarStr = ""
-	grammarStr += header()
-	val (bodyStr, terminalRules) = body()
-	grammarStr += bodyStr
-	grammarStr += footer(terminalRules)
-	return grammarStr
+        grammarStr += header()
+        val (bodyStr, terminalRules) = body()
+        grammarStr += bodyStr
+        grammarStr += footer(terminalRules)
+        return grammarStr
     }
 
     fun header(): String {
-	return """grammar ZheGrammar;
+        return """grammar ZheGrammar;
 
 @header {
 	import java.util.Map;
@@ -33,7 +33,7 @@ public class AntlrPrinter(val grammar: IGrammar) {
     }
 
     fun body(): Pair<String, Map<Int, TerminalRule>> {
-	var s = sectionPrefix
+        var s = sectionPrefix
         val sortedRules = grammar.rules.toSortedMap()
         var terminalRules = mutableMapOf<Int, TerminalRule>()
         var terminalRuleId = 0
@@ -56,7 +56,7 @@ public class AntlrPrinter(val grammar: IGrammar) {
                 s += "{\n"
                 // Add Antlr actions to set token as sensitive / not-sensitive.
                 newTerminalRuleIds.forEach { ruleId ->
-                    s += "\tisSensitive.put(\$TOKEN$ruleId.type, " +
+                    s += "\tisSensitive.put(\$TOKEN$ruleId.text, " +
                         "${terminalRules[ruleId]!!.isSensitive});\n"
                 }
                 s += "}"
@@ -65,26 +65,26 @@ public class AntlrPrinter(val grammar: IGrammar) {
             }
             s += ";\n"
         }
-	return Pair(s, terminalRules)
+        return Pair(s, terminalRules)
     }
 
     fun footer(terminalRules: Map<Int, TerminalRule>): String {
-	return terminalTokenRules(terminalRules) +
-	       skipRules()
+        return terminalTokenRules(terminalRules) +
+            skipRules()
     }
 
     fun terminalTokenRules(terminalRules: Map<Int, TerminalRule>): String {
         // Add one rule per terminal token
-	var s = sectionPrefix
+        var s = sectionPrefix
         terminalRules.forEach { id, rule ->
             s += "TOKEN$id: ${Pattern.tokenize(rule.pattern)};\n"
         }
-	return s
+        return s
     }
 
     fun skipRules(): String {
         var s = sectionPrefix
         s += "WHITESPACE: ' ' -> skip;\n"
-	return s
+        return s
     }
 }

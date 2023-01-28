@@ -3,7 +3,6 @@ package zhe.ParSy
 import zhe.ParSy.Grammar.IGrammar
 import zhe.ParSy.Merger.HeapCNFMerger
 import zhe.ParSy.Merger.IMerger
-import zhe.ParSy.Metrics.NumberOfSentencesInGrammar
 import zhe.ParSy.SensitiveMarker.SensitiveMarker
 import zhe.ParSy.Solver.ISolver
 import zhe.ParSy.Solver.TrivialSolver

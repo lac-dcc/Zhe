@@ -2,7 +2,6 @@ package zhe.ParSy.Grammar
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
 import zhe.ParSy.Solver.TrivialSolver
 
 public class HeapCNFGrammarTest {
@@ -15,5 +14,4 @@ public class HeapCNFGrammarTest {
         val rootRule = grammar.root
         assertEquals(0, rootRule.id)
     }
-
 }
