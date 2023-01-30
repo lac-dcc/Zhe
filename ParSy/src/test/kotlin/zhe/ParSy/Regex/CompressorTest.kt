@@ -63,51 +63,51 @@ class CompressorTest {
     @Test
     fun compressFromExistingSingletonAlphaNum() {
         val actual = compressor.compressToString("a", "1")
-        val expected = "[abcdefghijklmnopqrstuvwxyz0123456789]*"
+        val expected = "[0123456789abcdefghijklmnopqrstuvwxyz]*"
         assertEquals(expected, actual)
     }
 
-    // @Test
-    // fun compressFromExistingMultipleRepeated() {
-    //     val actual = compressor.compressToString("aaaa", "aaaa")
-    //     val expected = "aaaa"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressFromExistingMultipleRepeated() {
+        val actual = compressor.compressToString("aaaa", "aaaa")
+        val expected = "[a]{1,1}[a]{1,1}[a]{1,1}[a]{1,1}"
+        assertEquals(expected, actual)
+    }
 
-    // @Test
-    // fun compressFromExistingMultipleEqual() {
-    //     val actual = compressor.compressToString("abcd", "abcd")
-    //     val expected = "abcd"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressFromExistingMultipleEqual() {
+        val actual = compressor.compressToString("abcd", "abcd")
+        val expected = "[a]{1,1}[b]{1,1}[c]{1,1}[d]{1,1}"
+        assertEquals(expected, actual)
+    }
 
-    // @Test
-    // fun compressFromExistingMultipleEqualAlphaAndNum() {
-    //     val actual = compressor.compressToString("abc12", "abc12")
-    //     val expected = "abc12"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressFromExistingMultipleEqualAlphaAndNum() {
+        val actual = compressor.compressToString("abc12", "abc12")
+        val expected = "[a]{1,1}[b]{1,1}[c]{1,1}[1]{1,1}[2]{1,1}"
+        assertEquals(expected, actual)
+    }
 
-    // @Test
-    // fun compressFromExistingMultipleTwoDiffOneEqual() {
-    //     val actual = compressor.compressToString("cba", "abc")
-    //     val expected = "${alphaStar}b$alphaStar"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressFromExistingMultipleTwoDiffOneEqual() {
+        val actual = compressor.compressToString("cba", "abc")
+        val expected = "[ac]{1,1}[b]{1,1}[ac]{1,1}"
+        assertEquals(expected, actual)
+    }
 
-    // @Test
-    // fun compressFromExistingMultipleAllDiff() {
-    //     val actual = compressor.compressToString("abc", "efg")
-    //     val expected = "$alphaStar"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressFromExistingMultipleAllDiff() {
+        val actual = compressor.compressToString("abc", "efg")
+        val expected = "[ae]{1,1}[bf]{1,1}[cg]{1,1}"
+        assertEquals(expected, actual)
+    }
 
-    // @Test
-    // fun compressFromExistingMultipleDifferentSizes() {
-    //     val actual = compressor.compressToString("abc", "abcdef")
-    //     val expected = "abc$alphaStar"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressFromExistingMultipleDifferentSizes() {
+        val actual = compressor.compressToString("abc", "abcdef")
+        val expected = "[a]{1,1}[b]{1,1}[c]{1,1}[def]{0,3}"
+        assertEquals(expected, actual)
+    }
 
     // @Test
     // fun compressFromExistingMultipleDifferentSizesTwice() {

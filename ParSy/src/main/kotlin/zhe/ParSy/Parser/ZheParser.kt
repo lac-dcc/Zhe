@@ -27,10 +27,11 @@ class ZheParser(
         val sensitiveTokenIndexes = sensitiveTokenIndexesList?.toSet()
             ?: setOf<Int>()
         val tokens = cleanLine.split(tokenDelimeter)
-        val newGrammar = solver.solve(tokens, sensitiveTokenIndexes)
-        grammar = merger.merge(grammar, newGrammar)
-        val grammarWasUpdated = true
+        val lineGrammar = solver.solve(tokens, sensitiveTokenIndexes)
+        val newGrammar = merger.merge(grammar, lineGrammar)
+        val grammarWasUpdated = newGrammar != grammar
         if (grammarWasUpdated) {
+            grammar = newGrammar
             File(grammarFilePath).writeText(grammar.toString())
         }
         return grammarWasUpdated

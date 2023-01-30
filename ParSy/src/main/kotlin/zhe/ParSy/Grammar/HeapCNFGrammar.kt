@@ -15,6 +15,10 @@ public class HeapCNFGrammar : IGrammar {
         return AntlrPrinter(this).string()
     }
 
+    override fun equals(other: Any?): Boolean {
+        return this.toString() == other.toString()
+    }
+
     companion object {
         fun maxSize(numTokens: Int): Int {
             return 2 * numTokens - 1

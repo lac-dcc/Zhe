@@ -10,6 +10,7 @@ class PowersetLattice(private val baseNodes: List<Node>) {
 }
 
 class Lattice(private val baseNodes: List<Node>) {
+    private val top = dummyNode().apply { this.isTop = true }
     private val powersetLattice = PowersetLattice(baseNodes)
     private val baseNodesMap = mutableMapOf<Char, Node>()
     init {
@@ -24,6 +25,12 @@ class Lattice(private val baseNodes: List<Node>) {
     }
 
     private fun getParentBaseNode(n: Node): Node? {
+        if (n.charset.isEmpty()) {
+            return null
+        }
+        if (!baseNodesMap.containsKey(n.charset.first())) {
+            return null
+        }
         return baseNodesMap[n.charset.first()]
     }
 
