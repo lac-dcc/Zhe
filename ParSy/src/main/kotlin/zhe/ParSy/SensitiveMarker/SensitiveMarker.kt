@@ -86,6 +86,8 @@ class SensitiveMarker(val tokenDelimeter: String) {
             nonMarkedLine += cleanLine.substring(nonMarkedLineIdx)
         }
 
+        logger.debug("Computed sensitive word indexes: $matchIndexes")
+
         return Pair(matchIndexes, nonMarkedLine)
     }
 }
