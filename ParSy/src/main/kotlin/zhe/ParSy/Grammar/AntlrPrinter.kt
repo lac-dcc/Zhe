@@ -27,7 +27,7 @@ public class AntlrPrinter(val grammar: IGrammar) {
 }
 
 @members {
-	Map<String, Boolean> isSensitive = new HashMap<String, Boolean>();
+	Map<Integer, Boolean> isSensitive = new HashMap<Integer, Boolean>();
 }
 """
     }
@@ -56,7 +56,7 @@ public class AntlrPrinter(val grammar: IGrammar) {
                 s += "{\n"
                 // Add Antlr actions to set token as sensitive / not-sensitive.
                 newTerminalRuleIds.forEach { ruleId ->
-                    s += "\tisSensitive.put(\$TOKEN$ruleId.text, " +
+                    s += "\tisSensitive.put(\$TOKEN$ruleId.type, " +
                         "${terminalRules[ruleId]!!.isSensitive});\n"
                 }
                 s += "}"
