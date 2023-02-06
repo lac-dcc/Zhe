@@ -39,16 +39,30 @@ public class AntlrPrinter(val grammar: IGrammar) {
         var terminalRuleId = 0
         var newTerminalRuleIds = listOf<Int>()
         sortedRules.forEach { _, productionRule ->
-            s += "r${productionRule.id}: "
-            productionRule.rules.forEach { subRule ->
-                if (subRule is ABRule) {
-                    s += "r${subRule.lRuleId} r${subRule.rRuleId} "
-                } else if (subRule is TerminalRule) {
-                    s += "TOKEN$terminalRuleId "
+            var subRules = productionRule.rules
+            s += "r${productionRule.id}:"
+
+            // If applicable, we need to first include the AB rule
+            val abRule = subRules.find { it is ABRule } as ABRule?
+            if (abRule != null) {
+                subRules -= abRule
+                s += " (r${abRule.lRuleId} r${abRule.rRuleId}) |"
+            }
+
+            subRules.forEach { subRule ->
+                if (subRule is TerminalRule) {
+                    s += " TOKEN$terminalRuleId |"
                     terminalRules[terminalRuleId] = subRule
                     newTerminalRuleIds += terminalRuleId
                     terminalRuleId++
+                } else {
+                    throw Exception("Expected rule to be TerminalRule")
                 }
+            }
+
+            if (s[s.length - 1] == '|') {
+                // Remove trailing | and whitespace
+                s = s.trimEnd { it == ' ' || it == '|' }
             }
 
             if (newTerminalRuleIds.size > 0) {

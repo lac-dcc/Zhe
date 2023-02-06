@@ -19,12 +19,12 @@ public class AntlrPrinterTest {
         val printer = AntlrPrinter(grammar)
         assertEquals(
             printer.header() + """
-r0: r1 r2 ;
-r1: TOKEN0 
+r0: (r1 r2);
+r1: TOKEN0
 {
 	isSensitive.put(${"$"}TOKEN0.type, false);
 };
-r2: TOKEN1 
+r2: TOKEN1
 {
 	isSensitive.put(${"$"}TOKEN1.type, false);
 };
@@ -47,17 +47,17 @@ TOKEN1: [W][o][r][l][d];
         val printer = AntlrPrinter(grammar)
         assertEquals(
             printer.header() + """
-r0: r1 r2 ;
-r1: TOKEN0 
+r0: (r1 r2);
+r1: TOKEN0
 {
 	isSensitive.put(${"$"}TOKEN0.type, false);
 };
-r2: r3 r4 ;
-r3: TOKEN1 
+r2: (r3 r4);
+r3: TOKEN1
 {
 	isSensitive.put(${"$"}TOKEN1.type, false);
 };
-r4: TOKEN2 
+r4: TOKEN2
 {
 	isSensitive.put(${"$"}TOKEN2.type, false);
 };

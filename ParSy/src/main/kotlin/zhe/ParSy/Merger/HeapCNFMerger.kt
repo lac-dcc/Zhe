@@ -44,7 +44,7 @@ public class HeapCNFMerger : IMerger {
             if (compressedRules.size == 0) {
                 logger.debug("Compressed rules is empty")
                 compressedRules = setOf<TerminalRule>(rule)
-                logger.debug("Built new compressed rules: ${compressedRules}")
+                logger.debug("Built new compressed rules: $compressedRules")
                 return@forEach
             }
 
@@ -54,7 +54,7 @@ public class HeapCNFMerger : IMerger {
             compressedRules.forEach { prevRule ->
                 logger.debug(
                     "In new iteration in inner forEach. " +
-                        "Previous rule: ${prevRule}"
+                        "Previous rule: $prevRule"
                 )
                 prevRegex = prevRule.pattern
                 val compressResult = compressor.compress(prevRegex, curRegex)
