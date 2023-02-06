@@ -40,20 +40,27 @@ public class AntlrPrinter(val grammar: IGrammar) {
         var newTerminalRuleIds = listOf<Int>()
         sortedRules.forEach { _, productionRule ->
             var subRules = productionRule.rules
-            s += "r${productionRule.id}:"
+            s += "r${productionRule.id}:\n\t"
 
             // If applicable, we need to first include the AB rule
             val abRule = subRules.find { it is ABRule } as ABRule?
             if (abRule != null) {
                 subRules -= abRule
-                s += " (r${abRule.lRuleId} r${abRule.rRuleId}) |"
+                s += "(r${abRule.lRuleId} r${abRule.rRuleId})"
             }
 
             subRules.forEach { subRule ->
+                if (productionRule.rules.size > 1) {
+                    s += "\n\t| "
+                }
                 if (subRule is TerminalRule) {
-                    s += " TOKEN$terminalRuleId |"
+                    s += "TOKEN$terminalRuleId"
+                    s += " {"
+                    // Add Antlr actions to set token as sensitive / not-sensitive.
+                    s += " isSensitive.put(\$TOKEN$terminalRuleId.type, " +
+                        "${subRule.isSensitive}); "
+                    s += "}"
                     terminalRules[terminalRuleId] = subRule
-                    newTerminalRuleIds += terminalRuleId
                     terminalRuleId++
                 } else {
                     throw Exception("Expected rule to be TerminalRule")
@@ -65,19 +72,7 @@ public class AntlrPrinter(val grammar: IGrammar) {
                 s = s.trimEnd { it == ' ' || it == '|' }
             }
 
-            if (newTerminalRuleIds.size > 0) {
-                s += "\n"
-                s += "{\n"
-                // Add Antlr actions to set token as sensitive / not-sensitive.
-                newTerminalRuleIds.forEach { ruleId ->
-                    s += "\tisSensitive.put(\$TOKEN$ruleId.type, " +
-                        "${terminalRules[ruleId]!!.isSensitive});\n"
-                }
-                s += "}"
-                // Reset list of terminal rules
-                newTerminalRuleIds = listOf<Int>()
-            }
-            s += ";\n"
+            s += "\n\t;\n"
         }
         return Pair(s, terminalRules)
     }

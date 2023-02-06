@@ -19,15 +19,15 @@ public class AntlrPrinterTest {
         val printer = AntlrPrinter(grammar)
         assertEquals(
             printer.header() + """
-r0: (r1 r2);
-r1: TOKEN0
-{
-	isSensitive.put(${"$"}TOKEN0.type, false);
-};
-r2: TOKEN1
-{
-	isSensitive.put(${"$"}TOKEN1.type, false);
-};
+r0:
+	(r1 r2)
+	;
+r1:
+	TOKEN0 { isSensitive.put(${"$"}TOKEN0.type, false); }
+	;
+r2:
+	TOKEN1 { isSensitive.put(${"$"}TOKEN1.type, false); }
+	;
 
 TOKEN0: [H][e][l][l][o];
 TOKEN1: [W][o][r][l][d];
@@ -47,20 +47,21 @@ TOKEN1: [W][o][r][l][d];
         val printer = AntlrPrinter(grammar)
         assertEquals(
             printer.header() + """
-r0: (r1 r2);
-r1: TOKEN0
-{
-	isSensitive.put(${"$"}TOKEN0.type, false);
-};
-r2: (r3 r4);
-r3: TOKEN1
-{
-	isSensitive.put(${"$"}TOKEN1.type, false);
-};
-r4: TOKEN2
-{
-	isSensitive.put(${"$"}TOKEN2.type, false);
-};
+r0:
+	(r1 r2)
+	;
+r1:
+	TOKEN0 { isSensitive.put(${"$"}TOKEN0.type, false); }
+	;
+r2:
+	(r3 r4)
+	;
+r3:
+	TOKEN1 { isSensitive.put(${"$"}TOKEN1.type, false); }
+	;
+r4:
+	TOKEN2 { isSensitive.put(${"$"}TOKEN2.type, false); }
+	;
 
 TOKEN0: [r][e][c][e][i][v][e][d];
 TOKEN1: [h][o][s][t];
