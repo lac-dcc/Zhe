@@ -1,21 +1,23 @@
 package zhe.ParSy.Grammar
 
-import zhe.ParSy.Grammar.Rule
+import zhe.ParSy.Grammar.Rule.ProductionRule
 
-public class HeapCNFGrammar : IGrammar{
+public class HeapCNFGrammar : IGrammar {
     override val rules: RulesMap
-    override val root: Rule
+    override val root: ProductionRule
         get() = this.rules[0]!!
 
     constructor(rules: RulesMap) {
         this.rules = rules
     }
 
-    override fun toString() : String {
-        var output: String = ""
-        rules.forEach { _, rule ->
-                output += rule.toString() + "\n"
+    override fun toString(): String {
+        return AntlrPrinter(this).string()
+    }
+
+    companion object {
+        fun maxSize(numTokens: Int): Int {
+            return 2 * numTokens - 1
         }
-        return output
     }
 }
