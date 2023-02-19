@@ -3,13 +3,26 @@ package zhe.ParSy.Regex
 val kleeneInterval = Pair<UInt, UInt>(0.toUInt(), 0.toUInt())
 
 class Node(
-    val charset: Set<Char>,
-    val interval: Pair<UInt, UInt>,
+    charset: Set<Char>,
+    interval: Pair<UInt, UInt>,
 ) {
     var isTop: Boolean = false
 
+    private var charset: Set<Char> = charset
+    private var interval: Pair<UInt, UInt> = interval
+
+    fun getCharset() = charset
+    fun getInterval() = interval
+
     fun isKleene(): Boolean {
         return this.interval == kleeneInterval
+    }
+
+    fun widenUpper(widening: Int) = this.let {
+        interval = Pair(
+            this.interval.first,
+            this.interval.second + widening.toUInt(),
+        )
     }
 
     override fun toString(): String {

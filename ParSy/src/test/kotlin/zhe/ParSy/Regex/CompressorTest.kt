@@ -29,11 +29,11 @@ class CompressorTest {
     }
 
     @Test
-    fun formatNodesTwoNodes() {
+    fun formatNodesTwoNodesIntoOne() {
         val tokens = nf.buildNodes("ab")
         val actual = compressor.formatNodes(tokens)
         val expected = listOf<Node>(Node(setOf<Char>('a', 'b'),
-                                         Pair(1.toUInt(), 1.toUInt())))
+                                         Pair(1.toUInt(), 2.toUInt())))
         assertEquals(expected, actual)
     }
 

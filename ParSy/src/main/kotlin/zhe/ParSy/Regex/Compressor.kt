@@ -29,18 +29,24 @@ class Compressor(
     }
 
     // TODO: move this somewhere else
-    fun formatNodes(tokens: List<Node>): List<Node> {
-        if (tokens.isEmpty()) {
+    fun formatNodes(nodes: List<Node>): List<Node> {
+        logger.debug("Formatting nodes: $nodes")
+
+        if (nodes.isEmpty()) {
             return listOf<Node>()
-        } else if (tokens.size == 1) {
-            return tokens
+        } else if (nodes.size == 1) {
+            return nodes
         }
 
-        val formattedNodes = mutableListOf<Node>(tokens[0])
+        val formattedNodes = mutableListOf<Node>(nodes[0])
         var fmtIdx = 0
         var origIdx = 1
-        while (origIdx < tokens.size) {
-            val glb = lattice.meet(formattedNodes[fmtIdx], tokens[origIdx])
+        while (origIdx < nodes.size) {
+            // Expand upper bound to accomodate one more character.
+            val fmtNode = formattedNodes[fmtIdx].apply { widenUpper(1) }
+
+            val glb = lattice.meet(fmtNode, nodes[origIdx])
+            logger.debug("Replacing node ${formattedNodes[fmtIdx]} with $glb")
             formattedNodes[fmtIdx] = glb
             origIdx++
         }
