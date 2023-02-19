@@ -6,10 +6,27 @@ import org.junit.jupiter.api.Test
 // TODO: add tests to test Inference Machine properties (iterative, set-driven,
 // etc) -aholmquist 2022-10-22
 class CompressorTest {
+    private val nf = NodeFactory()
     private val compressor = Compressor(
-        NodeFactory(),
+        nf,
         testBaseNodes
     )
+
+    @Test
+    fun formatNodesEmpty() {
+        val tokens = listOf<Node>()
+        val actual = compressor.formatNodes(tokens)
+        val expected = tokens
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun formatNodesOneNode() {
+        val tokens = nf.buildNodes("a")
+        val actual = compressor.formatNodes(tokens)
+        val expected = tokens
+        assertEquals(expected, actual)
+    }
 
     @Test
     fun compressEmpty() {
