@@ -18,10 +18,10 @@ class Node(
         return this.interval == kleeneInterval
     }
 
-    fun widenUpper(widening: Int) = this.let {
+    fun widenUpper(widening: Int) = with(this) {
         interval = Pair(
-            this.interval.first,
-            this.interval.second + widening.toUInt(),
+            interval.first,
+            interval.second + widening.toUInt(),
         )
     }
 

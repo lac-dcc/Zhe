@@ -9,7 +9,8 @@ class CompressorTest {
     private val nf = NodeFactory()
     private val compressor = Compressor(
         nf,
-        testBaseNodes
+        testBaseNodes,
+        testDisjointNodes,
     )
 
     @Test
@@ -43,6 +44,18 @@ class CompressorTest {
         val actual = compressor.formatNodes(tokens)
         val expected = listOf<Node>(Node(setOf<Char>('1', '2', '3'),
                                          Pair(1.toUInt(), 3.toUInt())))
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun formatNodesNodesTop() {
+        val tokens = nf.buildNodes("a:b")
+        val actual = compressor.formatNodes(tokens)
+        val expected = listOf<Node>(
+            Node(setOf<Char>('a'), Pair(1.toUInt(), 1.toUInt())),
+            Node(setOf<Char>(':'), Pair(1.toUInt(), 1.toUInt())),
+            Node(setOf<Char>('b'), Pair(1.toUInt(), 1.toUInt())),
+        )
         assertEquals(expected, actual)
     }
 
@@ -176,17 +189,17 @@ class CompressorTest {
         assertEquals(expected, actual)
     }
 
-    // @Test
-    // fun compressTimestampTwice() {
-    //     var actual = compressor.compressToString("00:00:00", "12:34:56")
-    //     var expected = "$numStar:$numStar:$numStar"
-    //     assertEquals(expected, actual)
+    @Test
+    fun compressTimestampTwice() {
+        var actual = compressor.compressToString("00:00:00", "12:34:56")
+        var expected = "[012]{1,2}[:]{1,1}[034]{1,2}[:]{1,1}[056]{1,2}"
+        assertEquals(expected, actual)
 
-    //     actual = compressor.compressToString(actual, "12:34:56")
-    //     // Regex should remain the same, given that we have already seen this
-    //     // example in the past.
-    //     assertEquals(expected, actual)
-    // }
+        actual = compressor.compressToString(actual, "12:34:56")
+        // Regex should remain the same, given that we have already seen this
+        // example in the past.
+        assertEquals(expected, actual)
+    }
 
     // @Test
     // fun compressIP() {

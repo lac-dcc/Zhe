@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class LatticeTest {
-    private val lattice = Lattice(testBaseNodes)
+    private val lattice = Lattice(testBaseNodes, testDisjointNodes)
 
     @Test
     fun respectsIntervalLimitsEmptyNode() {

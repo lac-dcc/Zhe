@@ -9,23 +9,20 @@ data class CompressionResult(
 
 class Compressor(
     private val nf: NodeFactory,
-    // TODO: remove default of empty list of nodes
-    private val baseNodes: List<Node> = listOf<Node>()
+    // TODO: remove default of empty list of nodes and accept lattice
+    // instead. This is here just while I am breaking everything improving the
+    // lattice.
+    private val baseNodes: List<Node> = listOf<Node>(),
+    private val disjointNodes: List<Pair<Node, Node>> = listOf<Pair<Node, Node>>(),
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass.name)
 
-    private val lattice = Lattice(baseNodes)
+    private val lattice = Lattice(baseNodes, disjointNodes)
 
     companion object {
         public fun newBasic(): Compressor {
             return Compressor(NodeFactory())
         }
-    }
-
-    fun compress(prevRegex: String, token: String): CompressionResult {
-        val prevRegexNodes = formatNodes(nf.buildNodes(prevRegex))
-        val tokenNodes = nf.buildNodes(token)
-        return compressNodes(prevRegexNodes, tokenNodes)
     }
 
     // TODO: move this somewhere else
@@ -43,14 +40,30 @@ class Compressor(
         var origIdx = 1
         while (origIdx < nodes.size) {
             // Expand upper bound to accomodate one more character.
-            val fmtNode = formattedNodes[fmtIdx].apply { widenUpper(1) }
-
-            val glb = lattice.meet(fmtNode, nodes[origIdx])
-            logger.debug("Replacing node ${formattedNodes[fmtIdx]} with $glb")
-            formattedNodes[fmtIdx] = glb
+            val origNode = nodes[origIdx]
+            val fmtNode = formattedNodes[fmtIdx]
             origIdx++
+
+            val glb = lattice.meet(fmtNode, origNode)
+            if (glb.isTop) {
+                formattedNodes += origNode
+                fmtIdx++
+                continue
+            }
+
+            formattedNodes[fmtIdx] = glb.apply { if (!isKleene()) { widenUpper(1) } }
         }
+
+        logger.debug("Formatted nodes: $formattedNodes")
+
         return formattedNodes
+    }
+
+    fun compress(prevRegex: String, token: String): CompressionResult {
+        val prevRegexNodes = formatNodes(nf.buildNodes(prevRegex))
+        logger.debug("Previous regexes in 'compress': $prevRegexNodes")
+        val tokenNodes = nf.buildNodes(token)
+        return compressNodes(prevRegexNodes, tokenNodes)
     }
 
     fun compressNodes(
