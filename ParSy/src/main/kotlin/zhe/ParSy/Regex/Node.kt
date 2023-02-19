@@ -15,6 +15,11 @@ class Node(
     override fun toString(): String {
         return "Node(charset=${charset} interval=${interval})"
     }
+
+    override fun equals(other: Any?): Boolean = when (other) {
+        is Node -> this.charset == other.charset && this.interval == other.interval
+        else -> false
+    }
 }
 
 fun dummyNode(): Node {

@@ -31,10 +31,20 @@ class Compressor(
     // TODO: move this somewhere else
     fun formatNodes(tokens: List<Node>): List<Node> {
         if (tokens.isEmpty()) {
+            return listOf<Node>()
+        } else if (tokens.size == 1) {
             return tokens
         }
-        
-        return tokens
+
+        val formattedNodes = mutableListOf<Node>(tokens[0])
+        var fmtIdx = 0
+        var origIdx = 1
+        while (origIdx < tokens.size) {
+            val glb = lattice.meet(formattedNodes[fmtIdx], tokens[origIdx])
+            formattedNodes[fmtIdx] = glb
+            origIdx++
+        }
+        return formattedNodes
     }
 
     fun compressNodes(
