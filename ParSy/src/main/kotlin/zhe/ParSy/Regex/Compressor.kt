@@ -23,7 +23,7 @@ class Compressor(
     }
 
     fun compress(prevRegex: String, token: String): CompressionResult {
-        val prevRegexNodes = nf.buildNodes(prevRegex)
+        val prevRegexNodes = formatNodes(nf.buildNodes(prevRegex))
         val tokenNodes = nf.buildNodes(token)
         return compressNodes(prevRegexNodes, tokenNodes)
     }
@@ -59,14 +59,14 @@ class Compressor(
         prevRegexNodes: List<Node>,
         tokenNodes: List<Node>
     ): CompressionResult {
+        val fmtTokenNodes = formatNodes(tokenNodes)
+
         if (prevRegexNodes.isEmpty()) {
-            return CompressionResult(nf.buildString(tokenNodes), false)
+            return CompressionResult(nf.buildString(fmtTokenNodes), false)
         }
         if (prevRegexNodes == tokenNodes) {
-            return CompressionResult(nf.buildString(tokenNodes), false)
+            return CompressionResult(nf.buildString(fmtTokenNodes), false)
         }
-
-        val fmtTokenNodes = formatNodes(tokenNodes)
 
         var tokenIdx: Int = 0
         var prevIdx: Int = 0

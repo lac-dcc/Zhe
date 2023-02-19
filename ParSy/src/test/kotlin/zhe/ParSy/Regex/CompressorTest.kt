@@ -38,6 +38,15 @@ class CompressorTest {
     }
 
     @Test
+    fun formatNodesThreeNodesIntoOneNums() {
+        val tokens = nf.buildNodes("123")
+        val actual = compressor.formatNodes(tokens)
+        val expected = listOf<Node>(Node(setOf<Char>('1', '2', '3'),
+                                         Pair(1.toUInt(), 3.toUInt())))
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun compressEmpty() {
         val actual = compressor.compressToString("", "")
         val expected = ""
@@ -61,14 +70,14 @@ class CompressorTest {
     @Test
     fun compressManyChar() {
         val actual = compressor.compressToString("", "abcd")
-        val expected = "[a]{1,1}[b]{1,1}[c]{1,1}[d]{1,1}"
+        val expected = "[abcd]{1,4}"
         assertEquals(expected, actual)
     }
 
     @Test
     fun compressManyNum() {
         val actual = compressor.compressToString("", "1234")
-        val expected = "[1]{1,1}[2]{1,1}[3]{1,1}[4]{1,1}"
+        val expected = "[1234]{1,4}"
         assertEquals(expected, actual)
     }
 
@@ -96,79 +105,79 @@ class CompressorTest {
     @Test
     fun compressFromExistingMultipleRepeated() {
         val actual = compressor.compressToString("aaaa", "aaaa")
-        val expected = "[a]{1,1}[a]{1,1}[a]{1,1}[a]{1,1}"
+        val expected = "[a]{1,4}"
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun compressFromExistingMultipleEqual() {
+        val actual = compressor.compressToString("abcd", "abcd")
+        val expected = "[abcd]{1,4}"
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun compressFromExistingMultipleEqualAlphaAndNum() {
+        val actual = compressor.compressToString("abc12", "abc12")
+        val expected = "[0123456789abcdefghijklmnopqrstuvwxyz]*"
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun compressFromExistingMultipleTwoDiffOneEqual() {
+        val actual = compressor.compressToString("cba", "abc")
+        val expected = "[abc]{1,3}"
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun compressFromExistingMultipleAllDiff() {
+        val actual = compressor.compressToString("abc", "efg")
+        val expected = "[abcefg]{1,3}"
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun compressFromExistingMultipleDifferentSizes() {
+        val actual = compressor.compressToString("abc", "abcdef")
+        val expected = "[abcdef]{1,6}"
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun compressFromExistingMultipleDifferentSizesTwice() {
+        val actual1 = compressor.compressToString("abc", "abcdef")
+        val expected1 = "[abcdef]{1,6}"
+        assertEquals(expected1, actual1)
+
+        val actual2 = compressor.compressToString(actual1, "abcdefghi")
+        val expected2 = "[abcdefghi]{1,9}"
+        assertEquals(expected2, actual2)
+    }
+
+    @Test
+    fun compressFromExistingPreviousIsLonger() {
+        val actual = compressor.compressToString("abcdef", "abc")
+        val expected = "[abcdef]{1,6}"
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun compressFromExistingMultipleAlphaNumDiff() {
+        val actual = compressor.compressToString("abc12", "efg34")
+        val expected = "[0123456789abcdefghijklmnopqrstuvwxyz]*"
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun compressTimestamp() {
+        val actual = compressor.compressToString("00:00:00", "12:34:56")
+        val expected = "[012]{1,2}[:]{1,1}[034]{1,2}[:]{1,1}[056]{1,2}"
         assertEquals(expected, actual)
     }
 
     // @Test
-    // fun compressFromExistingMultipleEqual() {
-    //     val actual = compressor.compressToString("abcd", "abcd")
-    //     val expected = "[a]{1,1}[b]{1,1}[c]{1,1}[d]{1,1}"
-    //     assertEquals(expected, actual)
-    // }
-
-    // @Test
-    // fun compressFromExistingMultipleEqualAlphaAndNum() {
-    //     val actual = compressor.compressToString("abc12", "abc12")
-    //     val expected = "[a]{1,1}[b]{1,1}[c]{1,1}[1]{1,1}[2]{1,1}"
-    //     assertEquals(expected, actual)
-    // }
-
-    // @Test
-    // fun compressFromExistingMultipleTwoDiffOneEqual() {
-    //     val actual = compressor.compressToString("cba", "abc")
-    //     val expected = "[ac]{1,1}[b]{1,1}[ac]{1,1}"
-    //     assertEquals(expected, actual)
-    // }
-
-    // @Test
-    // fun compressFromExistingMultipleAllDiff() {
-    //     val actual = compressor.compressToString("abc", "efg")
-    //     val expected = "[ae]{1,1}[bf]{1,1}[cg]{1,1}"
-    //     assertEquals(expected, actual)
-    // }
-
-    // @Test
-    // fun compressFromExistingMultipleDifferentSizes() {
-    //     val actual = compressor.compressToString("abc", "abcdef")
-    //     val expected = "[a]{1,1}[b]{1,1}[c]{1,1}[def]{0,3}"
-    //     assertEquals(expected, actual)
-    // }
-
-    // @Test
-    // fun compressFromExistingMultipleDifferentSizesTwice() {
-    //     val actual1 = compressor.compressToString("abc", "abcdef")
-    //     val expected1 = "abc$alphaStar"
-    //     assertEquals(expected1, actual1)
-
-    //     val actual2 = compressor.compressToString(actual1, "abcdefghi")
-    //     val expected2 = "abc$alphaStar"
-    //     assertEquals(expected2, actual2)
-    // }
-
-    // @Test
-    // fun compressFromExistingPreviousIsLonger() {
-    //     val actual = compressor.compressToString("abcdef", "abc")
-    //     val expected = "abc$alphaStar"
-    //     assertEquals(expected, actual)
-    // }
-
-    // @Test
-    // fun compressFromExistingMultipleAlphaNumDiff() {
-    //     val actual = compressor.compressToString("abc12", "efg34")
-    //     val expected = "${alphaStar}$numStar"
-    //     assertEquals(expected, actual)
-    // }
-
-    // @Test
-    // fun compressTimeStamp() {
-    //     val actual = compressor.compressToString("00:00:00", "12:34:56")
-    //     val expected = "$numStar:$numStar:$numStar"
-    //     assertEquals(expected, actual)
-    // }
-
-    // @Test
-    // fun compressTimeStampTwice() {
+    // fun compressTimestampTwice() {
     //     var actual = compressor.compressToString("00:00:00", "12:34:56")
     //     var expected = "$numStar:$numStar:$numStar"
     //     assertEquals(expected, actual)
@@ -330,31 +339,5 @@ class CompressorTest {
     // 	var actual = compressor.compressToString("ab.", "ab..a")
     // 	var expected = "ab${punctStar}${alphaStar}"
     // 	assertEquals(expected, actual)
-    // }
-
-    // @Test
-    // fun backtrackSubIP() {
-    //     val token = "123.456.789"
-    //     val tokenIdx = 1
-
-    //     val actual = compressor.backtrack(token, tokenIdx)
-    //     val expected = Compressor.BacktrackResult("$numStar", 0, 3, dummyNode())
-
-    //     assertEquals(expected.regex, actual.regex)
-    //     assertEquals(expected.left, actual.left)
-    //     assertEquals(expected.right, actual.right)
-    // }
-
-    // @Test
-    // fun backtrackProcessedTimestamp() {
-    //     val token = "$numStar:$numStar:$numStar"
-    //     val tokenIdx = 0
-
-    //     val actual = compressor.backtrack(token, tokenIdx)
-    //     val expected = Compressor.BacktrackResult("$numStar", 0, 6, dummyNode())
-
-    //     assertEquals(expected.regex, actual.regex)
-    //     assertEquals(expected.left, actual.left)
-    //     assertEquals(expected.right, actual.right)
     // }
 }
