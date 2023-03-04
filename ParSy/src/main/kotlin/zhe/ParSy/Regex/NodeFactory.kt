@@ -42,23 +42,31 @@ class NodeFactory {
             val charset = matchedGroups[1]
             val kleeneStar = matchedGroups[3]
             val rangeFirst = matchedGroups[5]
-            logger.debug("Charset: $charset. Kleene: $kleeneStar. "+
-                         "Range first: $rangeFirst.")
+            logger.debug(
+                "Charset: $charset. Kleene: $kleeneStar. " +
+                    "Range first: $rangeFirst."
+            )
             val rangeSecond = matchedGroups[6]
-            logger.debug("Charset: $charset. Kleene: $kleeneStar. "+
-                         "Range first: $rangeFirst. Range second: $rangeSecond")
+            logger.debug(
+                "Charset: $charset. Kleene: $kleeneStar. " +
+                    "Range first: $rangeFirst. Range second: $rangeSecond"
+            )
             if (charset == "") {
                 throw Exception("Malformed regex: charset must not be empty")
             }
             if (kleeneStar == "" && (rangeFirst == "" || rangeSecond == "")) {
-                throw Exception("Malformed regex: either kleene star or regex "+
-                                "range must be present")
+                throw Exception(
+                    "Malformed regex: either kleene star or regex " +
+                        "range must be present"
+                )
             }
             if (kleeneStar != "") {
                 nodes += Node(charsetFromS(charset), Pair(0.toUInt(), 0.toUInt()))
             } else {
-                nodes += Node(charsetFromS(charset),
-                              Pair(rangeFirst.toUInt(), rangeSecond.toUInt()))
+                nodes += Node(
+                    charsetFromS(charset),
+                    Pair(rangeFirst.toUInt(), rangeSecond.toUInt())
+                )
             }
         }
         return nodes

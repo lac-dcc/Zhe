@@ -13,7 +13,7 @@ class Compressor(
     // instead. This is here just while I am breaking everything improving the
     // lattice.
     private val baseNodes: List<Node> = listOf<Node>(),
-    private val disjointNodes: List<Pair<Node, Node>> = listOf<Pair<Node, Node>>(),
+    private val disjointNodes: List<Pair<Node, Node>> = listOf<Pair<Node, Node>>()
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass.name)
 
@@ -51,7 +51,13 @@ class Compressor(
                 continue
             }
 
-            formattedNodes[fmtIdx] = glb.apply { if (!isKleene()) { widenUpper(1) } }
+            // We want a node [a]{1,1}[b]{1,1}[c]{1,1} to become [abc]{3,3}
+            formattedNodes[fmtIdx] = glb.apply {
+                if (!isKleene() && !lattice.isBaseNode(glb)) {
+                    capInterval()
+                    incrementInterval()
+                }
+            }
         }
 
         logger.debug("Formatted nodes: $formattedNodes")
@@ -77,8 +83,12 @@ class Compressor(
         if (prevRegexNodes.isEmpty()) {
             return CompressionResult(nf.buildString(fmtTokenNodes), false)
         }
-        if (prevRegexNodes == tokenNodes) {
+        if (prevRegexNodes == fmtTokenNodes) {
             return CompressionResult(nf.buildString(fmtTokenNodes), false)
+        }
+        if (prevRegexNodes.size != fmtTokenNodes.size) {
+            // TODO: This is very wrong! Fix it
+            return CompressionResult("[.]*", true)
         }
 
         var tokenIdx: Int = 0
@@ -98,16 +108,21 @@ class Compressor(
             //     return CompressionResult(lattice.top.rule, true)
             // }
 
-            val lub = lattice.meet(curNode, newNode)
-            compressedNodes += lub
+            val glb = lattice.meet(curNode, newNode)
+            if (glb.isTop) {
+                return CompressionResult("[.]*", true)
+            }
+            compressedNodes += glb
             prevIdx++
             tokenIdx++
             // logger.debug("newNode.rule: ${newNode.rule}")
-            // logger.debug("lub.rule: ${lub.rule}")
+            // logger.debug("glb.rule: ${glb.rule}")
         }
 
-        logger.debug("State before adding leftovers: tokenIdx=${tokenIdx} " +
-                     "prevIdx=${prevIdx}")
+        logger.debug(
+            "State before adding leftovers: tokenIdx=$tokenIdx " +
+                "prevIdx=$prevIdx"
+        )
 
         // logger.debug("Final regex after adding leftovers: $finalRegex")
 

@@ -15,7 +15,6 @@ class NodeFactoryTest {
         })
     }
 
-
     @Test
     fun parseNodesA() {
         val s = "[a]{1,1}"
@@ -40,14 +39,13 @@ class NodeFactoryTest {
         assertEquals(expected, actual)
     }
 
-
     @Test
     fun parseNodesMultipleNodes() {
         val s = "[ab]{1,1}[:]{1,1}"
         val actual = nf.parseNodes(s)
         val expected = listOf<Node>(
             Node(setOf<Char>('a', 'b'), Pair(1.toUInt(), 1.toUInt())),
-            Node(setOf<Char>(':'), Pair(1.toUInt(), 1.toUInt())),
+            Node(setOf<Char>(':'), Pair(1.toUInt(), 1.toUInt()))
         )
         assertEquals(expected, actual)
     }
@@ -59,7 +57,7 @@ class NodeFactoryTest {
         val expected = listOf<Node>(
             Node(setOf<Char>('a', 'b'), Pair(1.toUInt(), 1.toUInt())),
             Node(setOf<Char>(':'), Pair(1.toUInt(), 1.toUInt())),
-            Node(setOf<Char>('1', '2', '3'), Pair(0.toUInt(), 0.toUInt())),
+            Node(setOf<Char>('1', '2', '3'), Pair(0.toUInt(), 0.toUInt()))
         )
         assertEquals(expected, actual)
     }

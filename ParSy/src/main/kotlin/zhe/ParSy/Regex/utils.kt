@@ -2,7 +2,12 @@ package zhe.ParSy.Regex
 
 // TODO: move charset stuff inside of a single class Charset
 fun collapseCharset(charset: Set<Char>): String {
-    return charset.toList().sorted().joinToString(separator = "")
+    var s = charset.toList().sorted().joinToString(separator = "")
+    val mustEscape = "[]"
+    mustEscape.forEach { c ->
+        s = s.replace(c.toString(), "\\$c")
+    }
+    return s
 }
 
 fun stringsToChars(ss: List<String>): List<Char> {
