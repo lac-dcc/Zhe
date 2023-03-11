@@ -19,7 +19,7 @@ class NodeFactory {
         // non-formatted one.
         var nodes = listOf<Node>()
         s.forEach {
-            nodes += Node(setOf(it), Pair(1.toUInt(), 1.toUInt()))
+            nodes += Node(setOf(it), Interval(1, 1))
         }
         return nodes
     }
@@ -54,11 +54,11 @@ class NodeFactory {
                 )
             }
             if (kleeneStar != "") {
-                nodes += Node(charsetFromS(charset), Pair(0.toUInt(), 0.toUInt()))
+                nodes += Node(charsetFromS(charset), Interval(0, 0))
             } else {
                 nodes += Node(
                     charsetFromS(charset),
-                    Pair(rangeFirst.toUInt(), rangeSecond.toUInt())
+                    Interval(rangeFirst.toInt(), rangeSecond.toInt())
                 )
             }
         }

@@ -1,15 +1,15 @@
 package zhe.ParSy.Regex
 
-val kleeneInterval = Pair<UInt, UInt>(0.toUInt(), 0.toUInt())
+val kleeneInterval = Interval(0, 0)
 
 class Node(
     charset: Set<Char>,
-    interval: Pair<UInt, UInt>
+    interval: Interval
 ) {
     var isTop: Boolean = false
 
     private var charsets: MutableList<Set<Char>> = mutableListOf<Set<Char>>(charset)
-    private var interval: Pair<UInt, UInt> = interval
+    private var interval: Interval = interval
 
     fun getCharset() = charsets.reduce { acc, charset -> acc + charset }
     fun addCharset(charset: Set<Char>) {
@@ -18,12 +18,12 @@ class Node(
     fun getInterval() = interval
 
     fun incrementInterval() {
-        interval = Pair(interval.first + 1.toUInt(), interval.second + 1.toUInt())
+        interval = Interval(interval.first + 1, interval.second + 1)
     }
 
     fun capInterval() {
-        val max = (if (interval.first > interval.second) interval.first else interval.second).toUInt()
-        interval = Pair(max, max)
+        val max = (if (interval.first > interval.second) interval.first else interval.second)
+        interval = Interval(max, max)
     }
 
     fun isKleene(): Boolean {
@@ -38,7 +38,7 @@ class Node(
         return this.getCharset().union(other.getCharset())
     }
 
-    fun joinInterval(other: Node): Pair<UInt, UInt> {
+    fun joinInterval(other: Node): Interval {
         var minLeft = this.getInterval().first
         if (other.getInterval().first < minLeft) {
             minLeft = other.getInterval().first
@@ -47,7 +47,7 @@ class Node(
         if (other.getInterval().second > maxRight) {
             maxRight = other.getInterval().second
         }
-        return Pair(minLeft, maxRight)
+        return Interval(minLeft, maxRight)
     }
 
     override fun toString(): String {
@@ -61,7 +61,7 @@ class Node(
 }
 
 fun dummyNode(): Node {
-    return Node(setOf(), Pair(1.toUInt(), 1.toUInt()))
+    return Node(setOf(), Interval(1, 1))
 }
 
 fun topNode(): Node {

@@ -1,10 +1,10 @@
 package zhe.ParSy.Regex
 
-fun testNodeInterval1To16() = Pair(1.toUInt(), 16.toUInt())
-fun testNodeInterval1To17() = Pair(1.toUInt(), 17.toUInt())
-fun testNodeInterval1To32() = Pair(1.toUInt(), 32.toUInt())
-fun testNodeInterval1To33() = Pair(1.toUInt(), 33.toUInt())
-fun testNodeInterval0To100() = Pair(0.toUInt(), 100.toUInt())
+fun testNodeInterval1To16() = Interval(1, 16)
+fun testNodeInterval1To17() = Interval(1, 17)
+fun testNodeInterval1To32() = Interval(1, 32)
+fun testNodeInterval1To33() = Interval(1, 33)
+fun testNodeInterval0To100() = Interval(0, 100)
 
 fun testNodeAlphasUpper() = Node(stringsToChars(allAlphasUpper).toSet(), testNodeInterval1To32())
 fun testNodeAlphasLower() = Node(stringsToChars(allAlphasLower).toSet(), testNodeInterval1To32())

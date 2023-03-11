@@ -36,7 +36,7 @@ class CompressorTest {
         val expected = listOf<Node>(
             Node(
                 setOf<Char>('a', 'b'),
-                Pair(2.toUInt(), 2.toUInt())
+                Interval(2, 2)
             )
         )
         assertEquals(expected, actual)
@@ -49,7 +49,7 @@ class CompressorTest {
         val expected = listOf<Node>(
             Node(
                 setOf<Char>('1', '2', '3'),
-                Pair(3.toUInt(), 3.toUInt())
+                Interval(3, 3)
             )
         )
         assertEquals(expected, actual)
@@ -60,9 +60,9 @@ class CompressorTest {
         val tokens = nf.buildNodes("a:b")
         val actual = compressor.formatNodes(tokens)
         val expected = listOf<Node>(
-            Node(setOf<Char>('a'), Pair(1.toUInt(), 1.toUInt())),
-            Node(setOf<Char>(':'), Pair(1.toUInt(), 1.toUInt())),
-            Node(setOf<Char>('b'), Pair(1.toUInt(), 1.toUInt()))
+            Node(setOf<Char>('a'), Interval(1, 1)),
+            Node(setOf<Char>(':'), Interval(1, 1)),
+            Node(setOf<Char>('b'), Interval(1, 1))
         )
         assertEquals(expected, actual)
     }
@@ -72,13 +72,13 @@ class CompressorTest {
         val tokens = nf.buildNodes("12.23.34.45")
         val actual = compressor.formatNodes(tokens)
         val expected = listOf<Node>(
-            Node(setOf<Char>('1', '2'), Pair(2.toUInt(), 2.toUInt())),
-            Node(setOf<Char>('.'), Pair(1.toUInt(), 1.toUInt())),
-            Node(setOf<Char>('2', '3'), Pair(2.toUInt(), 2.toUInt())),
-            Node(setOf<Char>('.'), Pair(1.toUInt(), 1.toUInt())),
-            Node(setOf<Char>('3', '4'), Pair(2.toUInt(), 2.toUInt())),
-            Node(setOf<Char>('.'), Pair(1.toUInt(), 1.toUInt())),
-            Node(setOf<Char>('4', '5'), Pair(2.toUInt(), 2.toUInt()))
+            Node(setOf<Char>('1', '2'), Interval(2, 2)),
+            Node(setOf<Char>('.'), Interval(1, 1)),
+            Node(setOf<Char>('2', '3'), Interval(2, 2)),
+            Node(setOf<Char>('.'), Interval(1, 1)),
+            Node(setOf<Char>('3', '4'), Interval(2, 2)),
+            Node(setOf<Char>('.'), Interval(1, 1)),
+            Node(setOf<Char>('4', '5'), Interval(2, 2))
         )
         assertEquals(expected, actual)
     }

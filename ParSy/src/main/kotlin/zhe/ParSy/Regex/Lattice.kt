@@ -6,7 +6,7 @@ class PowersetLattice(
     private val baseNodes: List<Node>,
     private val disjointBaseNodes: List<Pair<Node, Node>>
 ) {
-    public val top = topNode()
+    private val logger = LoggerFactory.getLogger(this.javaClass.name)
 
     // TODO: improve this function
     fun areDisjoint(n1: Node, n2: Node): Boolean {
@@ -25,8 +25,9 @@ class PowersetLattice(
     }
 
     fun meet(n1: Node, n2: Node): Node {
+        logger.debug("Meeting nodes $n1 and $n2 in powerset")
         if (areDisjoint(n1, n2)) {
-            return top
+            return topNode()
         }
         val glb = n1
         glb.addCharset(n2.getCharset())
@@ -43,9 +44,6 @@ class Lattice(
     private val logger = LoggerFactory.getLogger(this.javaClass.name)
 
     private val powersetLattice = PowersetLattice(baseNodes, disjointBaseNodes)
-
-    // TODO: Remove top attribute from this class
-    private val top = powersetLattice.top
 
     private val baseNodesMap = mutableMapOf<Char, Node>()
     init {
@@ -66,42 +64,25 @@ class Lattice(
         return parentBaseNode1 == parentBaseNode2
     }
 
-    // TODO: Make the interval a class and make this its method
-    fun isIntervalWithinBounds(
-        interval: Pair<UInt, UInt>,
-        bounds: Pair<UInt, UInt>
-    ): Boolean {
-        if (interval.first < bounds.first ||
-            interval.second > bounds.second
-        ) {
-            return false
-        }
-        return true
-    }
-
     // isNodeWithinBounds returns true if the node's interval is contained in
     // its respective base node interval.
     fun isNodeWithinBounds(n: Node): Boolean {
         if (n.getCharset().isEmpty()) {
-            logger.debug("do")
             return true
         }
         val interval = n.getInterval()
         val baseNode = getBaseNode(n)
         if (baseNode == null) {
-            logger.debug("da")
             return false
         }
         val baseNodeInterval = baseNode.getInterval()
-        logger.debug("di")
-        return isIntervalWithinBounds(interval, baseNodeInterval)
+        return interval.isWithinBound(baseNodeInterval)
     }
 
     fun meet(n1: Node, n2: Node): Node {
         logger.debug("Meeting nodes $n1 and $n2")
         if (n1.isTop || n2.isTop) {
-            logger.debug("Result: top")
-            return top
+            return topNode()
         }
         if (n1.getCharset().isEmpty()) {
             return n2
@@ -109,20 +90,14 @@ class Lattice(
             return n1
         }
         if (n1.isKleene() || n2.isKleene()) {
-            logger.debug("Result: powerset")
             val res = meetInPowerset(n1, n2)
-            logger.debug("Res: $res")
             return res
         }
         if (!areNodesCompatible(n1, n2)) {
-            logger.debug("Result: powerset")
             val res = elevateAndMeetInPowerset(n1, n2)
-            logger.debug("Res: $res")
             return res
         }
-        logger.debug("Result: interval node")
         val res = intervalMeet(n1, n2)
-        logger.debug("Res: $res")
         return res
     }
 

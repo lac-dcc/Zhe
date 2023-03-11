@@ -12,7 +12,7 @@ public class HeapCNFGrammar : IGrammar {
     }
 
     override fun toString(): String {
-        return AntlrPrinter(this).string()
+        return "TODO"
     }
 
     override fun equals(other: Any?): Boolean {
