@@ -14,4 +14,8 @@ class Interval(val first: Int, val second: Int) {
         is Interval -> this.first == other.first && this.second == other.second
         else -> false
     }
+
+    override fun toString(): String {
+        return "Interval($first, $second)"
+    }
 }

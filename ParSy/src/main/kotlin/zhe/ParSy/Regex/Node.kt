@@ -22,7 +22,7 @@ class Node(
     }
 
     fun capInterval() {
-        val max = (if (interval.first > interval.second) interval.first else interval.second)
+        val max = if (interval.first > interval.second) interval.first else interval.second
         interval = Interval(max, max)
     }
 

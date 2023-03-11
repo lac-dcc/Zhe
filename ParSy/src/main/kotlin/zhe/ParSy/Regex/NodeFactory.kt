@@ -9,7 +9,7 @@ class NodeFactory {
 
     private val regexRegex = """\[([^\[\]]+)\]((\*)|(\{(\d+),(\d+)\}))""".toRegex()
 
-    private fun buildBasicNodes(s: String): List<Node> {
+    fun buildBasicNodes(s: String): List<Node> {
         // Assume the entire string is just plain characters.
         //
         // Example
@@ -71,16 +71,6 @@ class NodeFactory {
         }
         if (s == dotStar) {
             return listOf(topNode())
-        }
-        if (s[0] != '[') {
-            // If the first character of the string is not a [, then it is
-            // not formatted as we expect. In this case, we assume the
-            // entire string is not formatted as expected and build basic
-            // nodes from each of its characters.
-            //
-            // TODO: improve parsing in cases like '[INFO] 2000-00-00 00:00:00
-            //       This is my log'
-            return buildBasicNodes(s)
         }
         return parseNodes(s)
     }

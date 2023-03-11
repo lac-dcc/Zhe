@@ -14,354 +14,361 @@ class CompressorTest {
     )
 
     @Test
-    fun formatNodesEmpty() {
-        val tokens = listOf<Node>()
-        val actual = compressor.formatNodes(tokens)
-        val expected = tokens
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun formatNodesOneNode() {
-        val tokens = nf.buildNodes("a")
-        val actual = compressor.formatNodes(tokens)
-        val expected = tokens
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun formatNodesTwoNodesIntoOne() {
-        val tokens = nf.buildNodes("ab")
-        val actual = compressor.formatNodes(tokens)
-        val expected = listOf<Node>(
-            Node(
-                setOf<Char>('a', 'b'),
-                Interval(2, 2)
-            )
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun formatNodesThreeNodesIntoOneNums() {
-        val tokens = nf.buildNodes("123")
-        val actual = compressor.formatNodes(tokens)
-        val expected = listOf<Node>(
-            Node(
-                setOf<Char>('1', '2', '3'),
-                Interval(3, 3)
-            )
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun formatNodesTop() {
-        val tokens = nf.buildNodes("a:b")
-        val actual = compressor.formatNodes(tokens)
-        val expected = listOf<Node>(
-            Node(setOf<Char>('a'), Interval(1, 1)),
-            Node(setOf<Char>(':'), Interval(1, 1)),
-            Node(setOf<Char>('b'), Interval(1, 1))
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun formatNodesIP() {
-        val tokens = nf.buildNodes("12.23.34.45")
-        val actual = compressor.formatNodes(tokens)
-        val expected = listOf<Node>(
-            Node(setOf<Char>('1', '2'), Interval(2, 2)),
-            Node(setOf<Char>('.'), Interval(1, 1)),
-            Node(setOf<Char>('2', '3'), Interval(2, 2)),
-            Node(setOf<Char>('.'), Interval(1, 1)),
-            Node(setOf<Char>('3', '4'), Interval(2, 2)),
-            Node(setOf<Char>('.'), Interval(1, 1)),
-            Node(setOf<Char>('4', '5'), Interval(2, 2))
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
     fun compressEmpty() {
-        val actual = compressor.compressToString("", "")
+        val ns1 = nf.buildBasicNodes("")
+        val ns2 = nf.buildBasicNodes("")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = ""
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressOneAlpha() {
-        val actual = compressor.compressToString("", "a")
+        val ns1 = nf.buildBasicNodes("")
+        val ns2 = nf.buildBasicNodes("a")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[a]{1,1}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressOneNum() {
-        val actual = compressor.compressToString("", "1")
+        val ns1 = nf.buildBasicNodes("")
+        val ns2 = nf.buildBasicNodes("1")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[1]{1,1}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressManyChar() {
-        val actual = compressor.compressToString("", "abcd")
+        val ns1 = nf.buildBasicNodes("")
+        val ns2 = nf.buildBasicNodes("abcd")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[abcd]{4,4}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressManyNum() {
-        val actual = compressor.compressToString("", "1234")
+        val ns1 = nf.buildBasicNodes("")
+        val ns2 = nf.buildBasicNodes("1234")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[1234]{4,4}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingSingletonEqual() {
-        val actual = compressor.compressToString("a", "a")
+        val ns1 = nf.buildBasicNodes("a")
+        val ns2 = nf.buildBasicNodes("a")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[a]{1,1}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingSingletonDiff() {
-        val actual = compressor.compressToString("a", "b")
+        val ns1 = nf.buildBasicNodes("a")
+        val ns2 = nf.buildBasicNodes("b")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[ab]{1,1}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingSingletonAlphaNum() {
-        val actual = compressor.compressToString("a", "1")
+        val ns1 = nf.buildBasicNodes("a")
+        val ns2 = nf.buildBasicNodes("1")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = alnumLowerStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingMultipleRepeated() {
-        val actual = compressor.compressToString("aaaa", "aaaa")
+        val ns1 = nf.buildBasicNodes("aaaa")
+        val ns2 = nf.buildBasicNodes("aaaa")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[a]{4,4}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingMultipleEqual() {
-        val actual = compressor.compressToString("abcd", "abcd")
+        val ns1 = nf.buildBasicNodes("abcd")
+        val ns2 = nf.buildBasicNodes("abcd")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[abcd]{4,4}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingMultipleEqualAlphaAndNum() {
-        val actual = compressor.compressToString("abc12", "abc12")
+        val ns1 = nf.buildBasicNodes("abc12")
+        val ns2 = nf.buildBasicNodes("abc12")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = alnumLowerStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingMultipleTwoDiffOneEqual() {
-        val actual = compressor.compressToString("cba", "abc")
+        val ns1 = nf.buildBasicNodes("cba")
+        val ns2 = nf.buildBasicNodes("abc")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[abc]{3,3}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingMultipleAllDiff() {
-        val actual = compressor.compressToString("abc", "efg")
+        val ns1 = nf.buildBasicNodes("abc")
+        val ns2 = nf.buildBasicNodes("efg")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[abcefg]{3,3}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingMultipleDifferentSizes() {
-        val actual = compressor.compressToString("abc", "abcdef")
+        val ns1 = nf.buildBasicNodes("abc")
+        val ns2 = nf.buildBasicNodes("abcdef")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[abcdef]{3,6}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingMultipleDifferentSizesTwice() {
-        val actual1 = compressor.compressToString("abc", "abcdef")
+        val ns1 = nf.buildBasicNodes("abc")
+        val ns2 = nf.buildBasicNodes("abcdef")
+        val actual1 = compressor.compressNodes(ns1, ns2)
         val expected1 = "[abcdef]{3,6}"
-        assertEquals(expected1, actual1)
+        assertEquals(expected1, nf.buildString(actual1))
 
-        val actual2 = compressor.compressToString(actual1, "abcdefghi")
+        val ns3 = nf.buildBasicNodes("abcdefghi")
+        val actual2 = compressor.compressNodes(actual1, ns3)
         val expected2 = "[abcdefghi]{3,9}"
-        assertEquals(expected2, actual2)
+        assertEquals(expected2, nf.buildString(actual2))
     }
 
     @Test
     fun compressFromExistingPreviousIsLonger() {
-        val actual = compressor.compressToString("abcdef", "abc")
+        val ns1 = nf.buildBasicNodes("abcdef")
+        val ns2 = nf.buildBasicNodes("abc")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[abcdef]{3,6}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressFromExistingMultipleAlphaNumDiff() {
-        val actual = compressor.compressToString("abc12", "efg34")
+        val ns1 = nf.buildBasicNodes("abc12")
+        val ns2 = nf.buildBasicNodes("efg34")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = alnumLowerStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressTimestamp() {
-        val actual = compressor.compressToString("00:00:00", "12:34:56")
+        val ns1 = nf.buildBasicNodes("00:00:00")
+        val ns2 = nf.buildBasicNodes("12:34:56")
+        val actual = compressor.compressNodes(ns1, ns2)
         val expected = "[012]{2,2}[:]{1,1}[034]{2,2}[:]{1,1}[056]{2,2}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressTimestampTwice() {
-        var actual = compressor.compressToString("00:00:00", "12:34:56")
+        val ns1 = nf.buildBasicNodes("00:00:00")
+        val ns2 = nf.buildBasicNodes("12:34:56")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = "[012]{2,2}[:]{1,1}[034]{2,2}[:]{1,1}[056]{2,2}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
 
-        actual = compressor.compressToString(actual, "12:34:56")
+        val ns3 = nf.buildBasicNodes("12:34:56")
+        actual = compressor.compressNodes(actual, ns3)
         // Regex should remain the same, given that we have already seen this
         // example in the past.
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressIP() {
-        var actual = compressor.compressToString("0.0.0.0", "12.34.56.78")
+        val ns1 = nf.buildBasicNodes("0.0.0.0")
+        val ns2 = nf.buildBasicNodes("12.34.56.78")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = "[012]{1,2}[.]{1,1}[034]{1,2}[.]{1,1}[056]{1,2}[.]{1,1}[078]{1,2}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressSubIP() {
-        var actual = compressor.compressToString("1.2.3", "123.456.789")
+        val ns1 = nf.buildBasicNodes("1.2.3")
+        val ns2 = nf.buildBasicNodes("123.456.789")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = "[123]{1,3}[.]{1,1}[2456]{1,3}[.]{1,1}[3789]{1,3}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressIPAndSubIPCommonNumbers() {
-        var actual = compressor.compressToString("123.345.786", "12.34.78")
-        var expected = "[123]{2,3}[.]{1,1}[345]{2,3}[.]{1,1}[678]{2,3}"
-        assertEquals(expected, actual)
+        val ns1 = nf.buildBasicNodes("123.456.789")
+        val ns2 = nf.buildBasicNodes("12.34.78")
+        var actual = compressor.compressNodes(ns1, ns2)
+        var expected = "[123]{2,3}[.]{1,1}[3456]{2,3}[.]{1,1}[789]{2,3}"
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressIPAndSubIPCommonNumbersTwice() {
-        var actual = compressor.compressToString("123.345.786", "12.34.78")
-        var expected = "[123]{2,3}[.]{1,1}[345]{2,3}[.]{1,1}[678]{2,3}"
-        assertEquals(expected, actual)
+        val ns1 = nf.buildBasicNodes("123.456.789")
+        val ns2 = nf.buildBasicNodes("12.34.78")
+        var actual = compressor.compressNodes(ns1, ns2)
+        var expected = "[123]{2,3}[.]{1,1}[3456]{2,3}[.]{1,1}[789]{2,3}"
+        assertEquals(expected, nf.buildString(actual))
 
         // Shouldn't change
-        actual = compressor.compressToString(expected, "12.34.78")
-        assertEquals(expected, actual)
+        actual = compressor.compressNodes(nf.buildNodes(expected), ns2)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressAlphaAndPunctSamePlace() {
-        var actual = compressor.compressToString("123a", "123:")
+        val ns1 = nf.buildBasicNodes("123a")
+        val ns2 = nf.buildBasicNodes("123:")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = dotStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressTimestampAndNumber() {
-        var actual = compressor.compressToString("00:00:00", "123")
+        val ns1 = nf.buildBasicNodes("00:00:00")
+        val ns2 = nf.buildBasicNodes("123")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = dotStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressTimestampAndPartialTimestamp() {
-        var actual = compressor.compressToString("00:00:00", "00:00")
+        val ns1 = nf.buildBasicNodes("00:00:00")
+        val ns2 = nf.buildBasicNodes("00:00")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = dotStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressTimestampAndPartialTimestampReverseOrder() {
-        var actual = compressor.compressToString("00:00", "00:00:00")
+        val ns1 = nf.buildBasicNodes("00:00")
+        val ns2 = nf.buildBasicNodes("00:00:00")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = dotStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressPunctsDifferentSizes() {
-        var actual = compressor.compressToString("---", "====")
+        val ns1 = nf.buildBasicNodes("---")
+        val ns2 = nf.buildBasicNodes("====")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = "[-=]{3,4}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressPunctsDifferentSizesReverseOrder() {
-        var actual = compressor.compressToString("====", "---")
+        val ns1 = nf.buildBasicNodes("====")
+        val ns2 = nf.buildBasicNodes("---")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = "[-=]{3,4}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressDifferentAmountsOfPunctsBetweenAlphas() {
-        var actual = compressor.compressToString("ab.cd", "ab..cd")
+        val ns1 = nf.buildBasicNodes("ab.cd")
+        val ns2 = nf.buildBasicNodes("ab..cd")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = "[ab]{2,2}[.]{1,2}[cd]{2,2}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressMissingPunct() {
-        var actual = compressor.compressToString("ab", "ab.")
+        val ns1 = nf.buildBasicNodes("ab")
+        val ns2 = nf.buildBasicNodes("ab.")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = dotStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressPunctWithAndWithoutAlphas() {
-        var actual = compressor.compressToString("ab.", "ab.a")
+        val ns1 = nf.buildBasicNodes("ab.")
+        val ns2 = nf.buildBasicNodes("ab.a")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = dotStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressAlphasAndAsterisk() {
+        val ns1 = nf.buildBasicNodes("Specified")
+        val ns2 = nf.buildBasicNodes("*")
         // Previously, this test case was resulting in an empty final regex.
-        var actual = compressor.compressToString("Specified", "*****")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = dotStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressSquareBracketsAndOtherPunct() {
-        var actual = compressor.compressToString("#[", "#]")
+        val ns1 = nf.buildBasicNodes("#[")
+        val ns2 = nf.buildBasicNodes("#]")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = "[#\\[\\]]{2,2}"
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressSingleNumAndMultipleAlpha() {
-        var actual = compressor.compressToString("7", "system")
+        val ns1 = nf.buildBasicNodes("7")
+        val ns2 = nf.buildBasicNodes("system")
+        var actual = compressor.compressNodes(ns1, ns2)
         var expected = alnumLowerStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     @Test
     fun compressWordsAndPunctuationMixed() {
-        var actual = compressor.compressToString("word1", "word2")
-        actual = compressor.compressToString(actual, "word3")
-        actual = compressor.compressToString(actual, "---")
-        actual = compressor.compressToString(actual, "==")
+        val ns1 = nf.buildBasicNodes("word1")
+        val ns2 = nf.buildBasicNodes("word2")
+        val ns3 = nf.buildBasicNodes("word3")
+        val ns4 = nf.buildBasicNodes("---")
+        val ns5 = nf.buildBasicNodes("==")
+        var actual = compressor.compressNodes(ns1, ns2)
+        actual = compressor.compressNodes(actual, ns3)
+        actual = compressor.compressNodes(actual, ns4)
+        actual = compressor.compressNodes(actual, ns5)
         var expected = dotStar
-        assertEquals(expected, actual)
+        assertEquals(expected, nf.buildString(actual))
     }
 
     // @Test
     // fun compressTokenIsRegex() {
-    //     var actual = compressor.compressToString("123.123.123.123", "$numStar[.]{1,1}$numStar[.]{1,1}$numStar[.]{1,1}$numStar")
+    //     var actual = compressor.compressNodes("123.123.123.123", "$numStar[.]{1,1}$numStar[.]{1,1}$numStar[.]{1,1}$numStar")
     //     var expected = "$numStar.$numStar.$numStar.$numStar"
     //     assertEquals(expected, actual)
     // }
 
     // @Test
     // fun compressCrazyPunctuationSpam() {
-    //     var actual = compressor.compressToString("12312-3-1=231-=3", "111-=-12=-312-23-=")
+    //     var actual = compressor.compressNodes("12312-3-1=231-=3", "111-=-12=-312-23-=")
     //     var expected = "${numStar}${punctStar}${numStar}${punctStar}${numStar}${punctStar}$numStar-=$numStar"
     //     assertEquals(expected, actual)
     // }
@@ -369,7 +376,7 @@ class CompressorTest {
     // // TODO: How to solve these cases :/ ? -aholmquist 2022-10-08
     // @Test
     // fun compressPunctWithAndWithoutAlphaAndDifferentAmountsOfPunct() {
-    // 	var actual = compressor.compressToString("ab.", "ab..a")
+    // 	var actual = compressor.compressNodes("ab.", "ab..a")
     // 	var expected = "ab${punctStar}${alphaStar}"
     // 	assertEquals(expected, actual)
     // }
