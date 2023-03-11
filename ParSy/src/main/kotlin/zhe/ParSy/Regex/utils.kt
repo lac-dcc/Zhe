@@ -1,5 +1,7 @@
 package zhe.ParSy.Regex
 
+val dotStar = ".*"
+
 // TODO: move charset stuff inside of a single class Charset
 fun collapseCharset(charset: Set<Char>): String {
     var s = charset.toList().sorted().joinToString(separator = "")

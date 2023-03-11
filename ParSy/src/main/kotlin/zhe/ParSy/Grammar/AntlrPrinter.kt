@@ -2,7 +2,6 @@ package zhe.ParSy.Grammar
 
 import zhe.ParSy.Grammar.Rule.ABRule
 import zhe.ParSy.Grammar.Rule.TerminalRule
-import zhe.ParSy.Regex.Pattern
 
 // AntlrPrinter is a grammar printer that is capable of printing a given grammar
 // in the Antlr syntax.
@@ -77,7 +76,7 @@ public class AntlrPrinter(val grammar: IGrammar) {
         // Add one rule per terminal token
         var s = sectionPrefix
         terminalRules.forEach { id, rule ->
-            s += "TOKEN$id: ${Pattern.tokenize(rule.pattern)};\n"
+            s += "TOKEN$id: TODO;\n"
         }
         return s
     }

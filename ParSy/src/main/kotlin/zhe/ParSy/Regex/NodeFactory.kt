@@ -9,13 +9,6 @@ class NodeFactory {
 
     private val regexRegex = """\[([^\[\]]+)\]((\*)|(\{(\d+),(\d+)\}))""".toRegex()
 
-    fun build(rule: String, parents: Set<Node>, level: Int): Node {
-        // TODO
-        // val newNode = Node(rule, parents, level)
-        // allNodes[rule] = newNode
-        return dummyNode()
-    }
-
     private fun buildBasicNodes(s: String): List<Node> {
         // Assume the entire string is just plain characters.
         //
@@ -113,13 +106,5 @@ class NodeFactory {
 
     fun get(s: String): Node {
         return allNodes.getValue(s)
-    }
-
-    fun getByPrefix(s: String, sidx: Int): Node {
-        return get(parseTokenPrefix(s, sidx))
-    }
-
-    fun getBySuffix(s: String, sidx: Int): Node {
-        return get(parseTokenSuffix(s, sidx))
     }
 }
