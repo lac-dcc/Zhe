@@ -6,7 +6,7 @@ class PowersetLattice(
     private val baseNodes: List<Node>,
     private val disjointBaseNodes: List<Pair<Node, Node>>
 ) {
-    public val top = dummyNode().apply { this.isTop = true }
+    public val top = topNode()
 
     // TODO: improve this function
     fun areDisjoint(n1: Node, n2: Node): Boolean {

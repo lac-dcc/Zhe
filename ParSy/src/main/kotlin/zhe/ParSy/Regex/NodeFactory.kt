@@ -76,6 +76,9 @@ class NodeFactory {
         if (s.isEmpty()) {
             return listOf<Node>()
         }
+        if (s == dotStar) {
+            return listOf(topNode())
+        }
         if (s[0] != '[') {
             // If the first character of the string is not a [, then it is
             // not formatted as we expect. In this case, we assume the
@@ -90,6 +93,11 @@ class NodeFactory {
     }
 
     fun buildString(nodes: List<Node>): String {
+        // Special case for top node
+        if (nodes.size == 1 && nodes[0].isTop) {
+            return dotStar
+        }
+
         var s = ""
         nodes.forEach {
             val cs = it.getCharset()

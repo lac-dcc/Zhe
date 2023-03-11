@@ -63,3 +63,7 @@ class Node(
 fun dummyNode(): Node {
     return Node(setOf(), Pair(1.toUInt(), 1.toUInt()))
 }
+
+fun topNode(): Node {
+    return dummyNode().apply { isTop = true }
+}

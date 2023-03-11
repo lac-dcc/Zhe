@@ -87,48 +87,23 @@ class Compressor(
             return CompressionResult(nf.buildString(fmtTokenNodes), false)
         }
         if (prevRegexNodes.size != fmtTokenNodes.size) {
-            // TODO: This is very wrong! Fix it
-            return CompressionResult("[.]*", true)
+            return CompressionResult(nf.buildString(listOf(topNode())), true)
         }
 
         var tokenIdx: Int = 0
         var prevIdx: Int = 0
         var compressedNodes = listOf<Node>()
         while (tokenIdx < fmtTokenNodes.size) {
-            logger.debug("New iteration.")
-            // logger.debug("finalRegex: $finalRegex")
-            // logger.debug("tokenIdx: $tokenIdx")
-            // logger.debug("prevRegexIdx: $prevRegexIdx")
-            // logger.debug("prevNode.rule: ${prevNode.rule}")
-            // logger.debug("curNode.rule: ${curNode.rule}")
-
             val curNode = prevRegexNodes[prevIdx]
             val newNode = fmtTokenNodes[tokenIdx]
-            // if (lattice.isTop(prevNode) || lattice.isTop(newNode)) {
-            //     return CompressionResult(lattice.top.rule, true)
-            // }
-
             val glb = lattice.meet(curNode, newNode)
             if (glb.isTop) {
-                return CompressionResult("[.]*", true)
+                return CompressionResult(nf.buildString(listOf(topNode())), true)
             }
             compressedNodes += glb
             prevIdx++
             tokenIdx++
-            // logger.debug("newNode.rule: ${newNode.rule}")
-            // logger.debug("glb.rule: ${glb.rule}")
         }
-
-        logger.debug(
-            "State before adding leftovers: tokenIdx=$tokenIdx " +
-                "prevIdx=$prevIdx"
-        )
-
-        // logger.debug("Final regex after adding leftovers: $finalRegex")
-
-        // if (finalRegex == "") {
-        //     return CompressionResult(lattice.top.rule, true)
-        // }
 
         return CompressionResult(nf.buildString(compressedNodes), false)
     }

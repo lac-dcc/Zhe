@@ -260,28 +260,28 @@ class CompressorTest {
     @Test
     fun compressAlphaAndPunctSamePlace() {
         var actual = compressor.compressToString("123a", "123:")
-        var expected = "[.]*"
+        var expected = ".*"
         assertEquals(expected, actual)
     }
 
     @Test
     fun compressTimestampAndNumber() {
         var actual = compressor.compressToString("00:00:00", "123")
-        var expected = "[.]*"
+        var expected = ".*"
         assertEquals(expected, actual)
     }
 
     @Test
     fun compressTimestampAndPartialTimestamp() {
         var actual = compressor.compressToString("00:00:00", "00:00")
-        var expected = "[.]*"
+        var expected = ".*"
         assertEquals(expected, actual)
     }
 
     @Test
     fun compressTimestampAndPartialTimestampReverseOrder() {
         var actual = compressor.compressToString("00:00", "00:00:00")
-        var expected = "[.]*"
+        var expected = ".*"
         assertEquals(expected, actual)
     }
 
@@ -309,14 +309,14 @@ class CompressorTest {
     @Test
     fun compressMissingPunct() {
         var actual = compressor.compressToString("ab", "ab.")
-        var expected = "[.]*"
+        var expected = ".*"
         assertEquals(expected, actual)
     }
 
     @Test
     fun compressPunctWithAndWithoutAlphas() {
         var actual = compressor.compressToString("ab.", "ab.a")
-        var expected = "[.]*"
+        var expected = ".*"
         assertEquals(expected, actual)
     }
 
@@ -324,7 +324,7 @@ class CompressorTest {
     fun compressAlphasAndAsterisk() {
         // Previously, this test case was resulting in an empty final regex.
         var actual = compressor.compressToString("Specified", "*****")
-        var expected = "[.]*"
+        var expected = ".*"
         assertEquals(expected, actual)
     }
 
@@ -348,7 +348,7 @@ class CompressorTest {
         actual = compressor.compressToString(actual, "word3")
         actual = compressor.compressToString(actual, "---")
         actual = compressor.compressToString(actual, "==")
-        var expected = "[.]*"
+        var expected = ".*"
         assertEquals(expected, actual)
     }
 
