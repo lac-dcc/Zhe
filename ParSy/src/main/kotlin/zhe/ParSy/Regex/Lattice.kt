@@ -29,10 +29,10 @@ class PowersetLattice(
         if (areDisjoint(n1, n2)) {
             return topNode()
         }
-        val glb = n1
-        glb.addCharset(n2.getCharset())
-        glb.kleenize()
-        return glb
+        return n1.apply {
+            addCharset(n2.getCharset())
+            kleenize()
+        }
     }
 }
 
@@ -51,7 +51,6 @@ class Lattice(
         //
         // TODO: is there a way to avoid this assumption?
         baseNodes.forEach { node ->
-            logger.debug("Adding node $node to base nodes map")
             node.getCharset().forEach { c ->
                 baseNodesMap[c] = node
             }
@@ -59,9 +58,7 @@ class Lattice(
     }
 
     fun areNodesCompatible(n1: Node, n2: Node): Boolean {
-        val parentBaseNode1 = getBaseNode(n1)
-        val parentBaseNode2 = getBaseNode(n2)
-        return parentBaseNode1 == parentBaseNode2
+        return getBaseNode(n1) == getBaseNode(n2)
     }
 
     // isNodeWithinBounds returns true if the node's interval is contained in
@@ -136,7 +133,6 @@ class Lattice(
     private fun intervalMeet(n1: Node, n2: Node): Node {
         val intervalNode = Node(n1.joinCharset(n2), n1.joinInterval(n2))
         if (!isNodeWithinBounds(intervalNode)) {
-            logger.debug("Node $intervalNode not within bounds!")
             return elevateAndMeetInPowerset(n1, n2)
         }
         return intervalNode

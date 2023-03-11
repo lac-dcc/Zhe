@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory
 class NodeFactory {
     private val logger = LoggerFactory.getLogger(this.javaClass.name)
 
-    private var allNodes = mutableMapOf<String, Node>()
-
     private val regexRegex = """\[([^\[\]]+)\]((\*)|(\{(\d+),(\d+)\}))""".toRegex()
 
     fun buildBasicNodes(s: String): List<Node> {
@@ -25,6 +23,13 @@ class NodeFactory {
     }
 
     fun parseNodes(s: String): List<Node> {
+        if (s.isEmpty()) {
+            return listOf<Node>()
+        }
+        if (s == dotStar) {
+            return listOf(topNode())
+        }
+
         var matchResults = regexRegex.findAll(s)
         if (matchResults.count() == 0) {
             throw Exception("Malformed regex: no matches found in $s")
@@ -35,15 +40,7 @@ class NodeFactory {
             val charset = matchedGroups[1]
             val kleeneStar = matchedGroups[3]
             val rangeFirst = matchedGroups[5]
-            logger.debug(
-                "Charset: $charset. Kleene: $kleeneStar. " +
-                    "Range first: $rangeFirst."
-            )
             val rangeSecond = matchedGroups[6]
-            logger.debug(
-                "Charset: $charset. Kleene: $kleeneStar. " +
-                    "Range first: $rangeFirst. Range second: $rangeSecond"
-            )
             if (charset == "") {
                 throw Exception("Malformed regex: charset must not be empty")
             }
@@ -65,16 +62,6 @@ class NodeFactory {
         return nodes
     }
 
-    fun buildNodes(s: String): List<Node> {
-        if (s.isEmpty()) {
-            return listOf<Node>()
-        }
-        if (s == dotStar) {
-            return listOf(topNode())
-        }
-        return parseNodes(s)
-    }
-
     fun buildString(nodes: List<Node>): String {
         // Special case for top node
         if (nodes.size == 1 && nodes[0].isTop) {
@@ -92,9 +79,5 @@ class NodeFactory {
             }
         }
         return s
-    }
-
-    fun get(s: String): Node {
-        return allNodes.getValue(s)
     }
 }

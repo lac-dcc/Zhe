@@ -22,7 +22,6 @@ class Formatter(private val lattice: Lattice) {
             val origNode = nodes[origIdx]
             val fmtNode = formattedNodes[fmtIdx]
             origIdx++
-
             val glb = lattice.meet(fmtNode, origNode)
             if (glb.isTop) {
                 formattedNodes += origNode

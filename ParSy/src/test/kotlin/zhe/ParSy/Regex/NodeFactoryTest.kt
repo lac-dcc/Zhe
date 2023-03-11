@@ -1,7 +1,6 @@
 package zhe.ParSy.Regex
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 
 class NodeFactoryTest {
@@ -10,9 +9,9 @@ class NodeFactoryTest {
     @Test
     fun parseNodesEmpty() {
         val s = ""
-        assertThrows(Exception::class.java, {
-            nf.parseNodes(s)
-        })
+        val actual = nf.parseNodes(s)
+        val expected = listOf<Node>()
+        assertEquals(expected, actual)
     }
 
     @Test

@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test
 // etc) -aholmquist 2022-10-22
 class CompressorTest {
     private val nf = NodeFactory()
+    private val lattice = Lattice(testBaseNodes(), testDisjointNodes())
     private val compressor = Compressor(
         nf,
-        testBaseNodes(),
-        testDisjointNodes()
+        lattice
     )
 
     @Test
@@ -231,7 +231,7 @@ class CompressorTest {
         assertEquals(expected, nf.buildString(actual))
 
         // Shouldn't change
-        actual = compressor.compressNodes(nf.buildNodes(expected), ns2)
+        actual = compressor.compressNodes(nf.parseNodes(expected), ns2)
         assertEquals(expected, nf.buildString(actual))
     }
 
@@ -359,25 +359,21 @@ class CompressorTest {
         assertEquals(expected, nf.buildString(actual))
     }
 
-    // @Test
-    // fun compressTokenIsRegex() {
-    //     var actual = compressor.compressNodes("123.123.123.123", "$numStar[.]{1,1}$numStar[.]{1,1}$numStar[.]{1,1}$numStar")
-    //     var expected = "$numStar.$numStar.$numStar.$numStar"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressTokenIsRegex() {
+        val ns1 = nf.buildBasicNodes("123.123.123.123")
+        val ns2 = nf.parseNodes("$numStar[.]{1,1}$numStar[.]{1,1}$numStar[.]{1,1}$numStar")
+        var actual = compressor.compressNodes(ns1, ns2)
+        val expected = "$numStar[.]{1,1}$numStar[.]{1,1}$numStar[.]{1,1}$numStar"
+        assertEquals(expected, nf.buildString(actual))
+    }
 
-    // @Test
-    // fun compressCrazyPunctuationSpam() {
-    //     var actual = compressor.compressNodes("12312-3-1=231-=3", "111-=-12=-312-23-=")
-    //     var expected = "${numStar}${punctStar}${numStar}${punctStar}${numStar}${punctStar}$numStar-=$numStar"
-    //     assertEquals(expected, actual)
-    // }
-
-    // // TODO: How to solve these cases :/ ? -aholmquist 2022-10-08
-    // @Test
-    // fun compressPunctWithAndWithoutAlphaAndDifferentAmountsOfPunct() {
-    // 	var actual = compressor.compressNodes("ab.", "ab..a")
-    // 	var expected = "ab${punctStar}${alphaStar}"
-    // 	assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressCrazyPunctuationSpam() {
+        val ns1 = nf.buildBasicNodes("12312-3-1=231-=")
+        val ns2 = nf.buildBasicNodes("111-=-12=-312-23-=")
+        var actual = compressor.compressNodes(ns1, ns2)
+        var expected = "[123]{3,5}[-=]{1,3}[123]{1,2}[-=]{1,2}[123]{1,3}[-=]{1,1}[123]{2,3}[-=]{2,2}"
+        assertEquals(expected, nf.buildString(actual))
+    }
 }
