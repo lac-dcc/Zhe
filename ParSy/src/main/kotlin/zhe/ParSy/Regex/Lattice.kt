@@ -57,57 +57,52 @@ class Lattice(
         }
     }
 
-    fun respectCharsetUnionLimits(n1: Node, n2: Node): Boolean {
-        val parentBaseNode1 = getParentBaseNode(n1)
-        val parentBaseNode2 = getParentBaseNode(n2)
+    fun areNodesCompatible(n1: Node, n2: Node): Boolean {
+        val parentBaseNode1 = getBaseNode(n1)
+        val parentBaseNode2 = getBaseNode(n2)
         return parentBaseNode1 == parentBaseNode2
     }
 
-    fun respectsIntervalLimits(n: Node): Boolean {
-        if (n.getCharset().isEmpty()) {
-            return true
-        }
-        val parentBaseNode = getParentBaseNode(n)
-        logger.debug("Node: $n")
-        logger.debug("Parent base node: $parentBaseNode")
-        if (parentBaseNode == null) {
-            // Could not find matching parent base node!
-            return false
-        }
-        if (n.getInterval().first < parentBaseNode.getInterval().first ||
-            n.getInterval().second > parentBaseNode.getInterval().second
+    // TODO: Make the interval a class and make this its method
+    fun isIntervalWithinBounds(
+        interval: Pair<UInt, UInt>,
+        bounds: Pair<UInt, UInt>
+    ): Boolean {
+        if (interval.first < bounds.first ||
+            interval.second > bounds.second
         ) {
-            logger.debug("Could not find dodo2")
             return false
         }
         return true
     }
 
+    // isNodeWithinBounds returns true if the node's interval is contained in
+    // its respective base node interval.
+    fun isNodeWithinBounds(n: Node): Boolean {
+        if (n.getCharset().isEmpty()) {
+            return true
+        }
+        val interval = n.getInterval()
+        val baseNode = getBaseNode(n)
+        if (baseNode == null) {
+            return false
+        }
+        val baseNodeInterval = baseNode.getInterval()
+        return isIntervalWithinBounds(interval, baseNodeInterval)
+    }
+
     fun meet(n1: Node, n2: Node): Node {
         logger.debug("Meeting nodes $n1 and $n2")
-        if (n1.isKleene() || n2.isKleene() || !respectCharsetUnionLimits(n1, n2)) {
+        if (n1.isTop || n2.isTop) {
+            return top
+        }
+        if (n1.isKleene() || n2.isKleene()) {
             return meetInPowerset(n1, n2)
         }
-        var minLeft = n1.getInterval().first
-        if (n2.getInterval().first < minLeft) {
-            minLeft = n2.getInterval().first
+        if (!areNodesCompatible(n1, n2)) {
+            return elevateAndMeetInPowerset(n1, n2)
         }
-        var maxRight = n1.getInterval().second
-        if (n2.getInterval().second > maxRight) {
-            maxRight = n2.getInterval().second
-        }
-        val proposedIntervalNode = Node(
-            n1.getCharset().union(n2.getCharset()),
-            Pair(minLeft, maxRight)
-        )
-        logger.debug("Proposed interval node before: $proposedIntervalNode")
-        if (!respectsIntervalLimits(proposedIntervalNode)) {
-            val pwsetRes = meetInPowerset(n1, n2)
-            logger.debug("Pwsetres = $pwsetRes")
-            return pwsetRes
-        }
-        logger.debug("Proposed interval node: $proposedIntervalNode")
-        return proposedIntervalNode
+        return intervalMeet(n1, n2)
     }
 
     fun isBaseNode(n: Node): Boolean {
@@ -115,7 +110,7 @@ class Lattice(
         return baseNodes.contains(n)
     }
 
-    private fun getParentBaseNode(n: Node): Node? {
+    private fun getBaseNode(n: Node): Node? {
         if (n.getCharset().isEmpty()) {
             return null
         }
@@ -125,14 +120,25 @@ class Lattice(
         return baseNodesMap[n.getCharset().first()]
     }
 
-    private fun kleenizeNode(n: Node): Node {
-        if (n.isKleene() || n.isTop) {
-            return n
-        }
-        return getParentBaseNode(n)!!
+    private fun elevateToPowerset(n: Node): Node {
+        return getBaseNode(n)!!.apply { kleenize() }
     }
 
     private fun meetInPowerset(n1: Node, n2: Node): Node {
-        return powersetLattice.meet(kleenizeNode(n1), kleenizeNode(n2))
+        return powersetLattice.meet(n1, n2)
+    }
+
+    private fun elevateAndMeetInPowerset(n1: Node, n2: Node): Node {
+        val pwsetNode1 = elevateToPowerset(n1)
+        val pwsetNode2 = elevateToPowerset(n2)
+        return meetInPowerset(pwsetNode1, pwsetNode2)
+    }
+
+    private fun intervalMeet(n1: Node, n2: Node): Node {
+        val intervalNode = Node(n1.joinCharset(n2), n1.joinInterval(n2))
+        if (!isNodeWithinBounds(intervalNode)) {
+            return elevateAndMeetInPowerset(n1, n2)
+        }
+        return intervalNode
     }
 }

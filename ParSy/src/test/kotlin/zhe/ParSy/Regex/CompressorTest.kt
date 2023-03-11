@@ -119,7 +119,7 @@ class CompressorTest {
     @Test
     fun compressFromExistingSingletonAlphaNum() {
         val actual = compressor.compressToString("a", "1")
-        val expected = "[0123456789abcdefghijklmnopqrstuvwxyz]{1,32}"
+        val expected = "[0123456789abcdefghijklmnopqrstuvwxyz]*"
         assertEquals(expected, actual)
     }
 
@@ -140,7 +140,7 @@ class CompressorTest {
     @Test
     fun compressFromExistingMultipleEqualAlphaAndNum() {
         val actual = compressor.compressToString("abc12", "abc12")
-        val expected = "[0123456789abcdefghijklmnopqrstuvwxyz]{1,32}"
+        val expected = "[0123456789abcdefghijklmnopqrstuvwxyz]*"
         assertEquals(expected, actual)
     }
 
@@ -186,7 +186,7 @@ class CompressorTest {
     @Test
     fun compressFromExistingMultipleAlphaNumDiff() {
         val actual = compressor.compressToString("abc12", "efg34")
-        val expected = "[0123456789abcdefghijklmnopqrstuvwxyz]{1,32}"
+        val expected = "[0123456789abcdefghijklmnopqrstuvwxyz]*"
         assertEquals(expected, actual)
     }
 
@@ -321,22 +321,20 @@ class CompressorTest {
 
     @Test
     fun compressSingleNumAndMultipleAlpha() {
-        // Previously, this test case was resulting in \p{Alnum}*\p{Alpha} . It
-        // was a problem in the leftovers part.
         var actual = compressor.compressToString("7", "system")
         var expected = "[0123456789abcdefghijklmnopqrstuvwxyz]{1,16}"
         assertEquals(expected, actual)
     }
 
-    // @Test
-    // fun compressWordsAndPunctuationMixed() {
-    //     var actual = compressor.compressToString("word1", "word2")
-    //     actual = compressor.compressToString(actual, "word3")
-    //     actual = compressor.compressToString(actual, "---")
-    //     actual = compressor.compressToString(actual, "==")
-    //     var expected = ".*"
-    //     assertEquals(expected, actual)
-    // }
+    @Test
+    fun compressWordsAndPunctuationMixed() {
+        var actual = compressor.compressToString("word1", "word2")
+        actual = compressor.compressToString(actual, "word3")
+        actual = compressor.compressToString(actual, "---")
+        actual = compressor.compressToString(actual, "==")
+        var expected = "[.]*"
+        assertEquals(expected, actual)
+    }
 
     // @Test
     // fun compressTokenIsRegex() {

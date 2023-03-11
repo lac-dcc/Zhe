@@ -30,6 +30,26 @@ class Node(
         return this.interval == kleeneInterval
     }
 
+    fun kleenize() {
+        this.interval = kleeneInterval
+    }
+
+    fun joinCharset(other: Node): Set<Char> {
+        return this.getCharset().union(other.getCharset())
+    }
+
+    fun joinInterval(other: Node): Pair<UInt, UInt> {
+        var minLeft = this.getInterval().first
+        if (other.getInterval().first < minLeft) {
+            minLeft = other.getInterval().first
+        }
+        var maxRight = this.getInterval().second
+        if (other.getInterval().second > maxRight) {
+            maxRight = other.getInterval().second
+        }
+        return Pair(minLeft, maxRight)
+    }
+
     override fun toString(): String {
         return "Node(charset=${getCharset()} interval=${getInterval()})"
     }
