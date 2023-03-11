@@ -68,6 +68,22 @@ class CompressorTest {
     }
 
     @Test
+    fun formatNodesIP() {
+        val tokens = nf.buildNodes("12.23.34.45")
+        val actual = compressor.formatNodes(tokens)
+        val expected = listOf<Node>(
+            Node(setOf<Char>('1', '2'), Pair(2.toUInt(), 2.toUInt())),
+            Node(setOf<Char>('.'), Pair(1.toUInt(), 1.toUInt())),
+            Node(setOf<Char>('2', '3'), Pair(2.toUInt(), 2.toUInt())),
+            Node(setOf<Char>('.'), Pair(1.toUInt(), 1.toUInt())),
+            Node(setOf<Char>('3', '4'), Pair(2.toUInt(), 2.toUInt())),
+            Node(setOf<Char>('.'), Pair(1.toUInt(), 1.toUInt())),
+            Node(setOf<Char>('4', '5'), Pair(2.toUInt(), 2.toUInt()))
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun compressEmpty() {
         val actual = compressor.compressToString("", "")
         val expected = ""
@@ -236,8 +252,8 @@ class CompressorTest {
         var expected = "[123]{2,3}[.]{1,1}[345]{2,3}[.]{1,1}[678]{2,3}"
         assertEquals(expected, actual)
 
+        // Shouldn't change
         actual = compressor.compressToString(expected, "12.34.78")
-        expected = expected
         assertEquals(expected, actual)
     }
 
@@ -322,7 +338,7 @@ class CompressorTest {
     @Test
     fun compressSingleNumAndMultipleAlpha() {
         var actual = compressor.compressToString("7", "system")
-        var expected = "[0123456789abcdefghijklmnopqrstuvwxyz]{1,16}"
+        var expected = "[0123456789abcdefghijklmnopqrstuvwxyz]*"
         assertEquals(expected, actual)
     }
 

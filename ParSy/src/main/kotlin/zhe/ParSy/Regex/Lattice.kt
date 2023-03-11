@@ -28,7 +28,10 @@ class PowersetLattice(
         if (areDisjoint(n1, n2)) {
             return top
         }
-        return n1.apply { addCharset(n2.getCharset()) }
+        val glb = n1
+        glb.addCharset(n2.getCharset())
+        glb.kleenize()
+        return glb
     }
 }
 
@@ -80,29 +83,47 @@ class Lattice(
     // its respective base node interval.
     fun isNodeWithinBounds(n: Node): Boolean {
         if (n.getCharset().isEmpty()) {
+            logger.debug("do")
             return true
         }
         val interval = n.getInterval()
         val baseNode = getBaseNode(n)
         if (baseNode == null) {
+            logger.debug("da")
             return false
         }
         val baseNodeInterval = baseNode.getInterval()
+        logger.debug("di")
         return isIntervalWithinBounds(interval, baseNodeInterval)
     }
 
     fun meet(n1: Node, n2: Node): Node {
         logger.debug("Meeting nodes $n1 and $n2")
         if (n1.isTop || n2.isTop) {
+            logger.debug("Result: top")
             return top
         }
+        if (n1.getCharset().isEmpty()) {
+            return n2
+        } else if (n2.getCharset().isEmpty()) {
+            return n1
+        }
         if (n1.isKleene() || n2.isKleene()) {
-            return meetInPowerset(n1, n2)
+            logger.debug("Result: powerset")
+            val res = meetInPowerset(n1, n2)
+            logger.debug("Res: $res")
+            return res
         }
         if (!areNodesCompatible(n1, n2)) {
-            return elevateAndMeetInPowerset(n1, n2)
+            logger.debug("Result: powerset")
+            val res = elevateAndMeetInPowerset(n1, n2)
+            logger.debug("Res: $res")
+            return res
         }
-        return intervalMeet(n1, n2)
+        logger.debug("Result: interval node")
+        val res = intervalMeet(n1, n2)
+        logger.debug("Res: $res")
+        return res
     }
 
     fun isBaseNode(n: Node): Boolean {
@@ -117,11 +138,14 @@ class Lattice(
         if (!baseNodesMap.containsKey(n.getCharset().first())) {
             return null
         }
-        return baseNodesMap[n.getCharset().first()]
+        val nref = baseNodesMap[n.getCharset().first()]!!
+        return Node(nref.getCharset(), nref.getInterval())
     }
 
     private fun elevateToPowerset(n: Node): Node {
-        return getBaseNode(n)!!.apply { kleenize() }
+        val baseNode = getBaseNode(n)!!
+        baseNode.kleenize()
+        return baseNode
     }
 
     private fun meetInPowerset(n1: Node, n2: Node): Node {
@@ -137,6 +161,7 @@ class Lattice(
     private fun intervalMeet(n1: Node, n2: Node): Node {
         val intervalNode = Node(n1.joinCharset(n2), n1.joinInterval(n2))
         if (!isNodeWithinBounds(intervalNode)) {
+            logger.debug("Node $intervalNode not within bounds!")
             return elevateAndMeetInPowerset(n1, n2)
         }
         return intervalNode
